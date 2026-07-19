@@ -1,4 +1,4 @@
-const API_URL =
+export const API_URL =
   process.env.NEXT_PUBLIC_API_URL ||
   "https://backend-dev.flybirdsleggings.com/api";
 
@@ -120,8 +120,6 @@ export async function verifyOtp<T>(payload: any): Promise<T> {
   if (!res.ok) throw { error: data };
   return data;
 }
-
-// app/lib/api.ts (additions)
 
 export async function getUserInfo<T>(userId: string): Promise<T> {
   const res = await fetch(`${API_URL}/auth/user/info/${userId}`, {
@@ -399,6 +397,40 @@ export async function removeCartItem<T>(
 
 export async function getRecentlyViewed<T>(userId: string): Promise<T> {
   const res = await fetch(`${API_URL}/recently-viewed/${userId}`, {
+    headers: getHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw { error: data };
+  return data;
+}
+
+// ---------- Orders / Payment (added for checkout → payment → review flow) ----------
+
+export async function createOrder<T>(payload: any): Promise<T> {
+  const res = await fetch(`${API_URL}/orders/checkout`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw { error: data };
+  return data;
+}
+
+export async function verifyPayment<T>(payload: any): Promise<T> {
+  const res = await fetch(`${API_URL}/payment/verify`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw { error: data };
+  return data;
+}
+
+export async function sentMail<T>(orderId: string | number): Promise<T> {
+  const res = await fetch(`${API_URL}/orders/${orderId}/invoice-mail`, {
+    method: "POST",
     headers: getHeaders(),
   });
   const data = await res.json();

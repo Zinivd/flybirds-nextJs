@@ -4,30 +4,103 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { getCategoryList } from "@/app/lib/api";
+import { CategoryItem } from "@/app/types/shop.models";
+
 import "./navbar.css"
+
+const CATEGORY_NAV_MAP: Record<string, string> = {
+    "Shimmer": "Shimmer legging",
+    "Saree Shaper": "Saree Shaper",
+    "Ankle": "Ankle legging",
+};
 
 export default function Navbar() {
     const pathname = usePathname();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [categories, setCategories] = useState<CategoryItem[]>([]);
 
     useEffect(() => {
         setIsLoggedIn(!!localStorage.getItem("authToken"));
     }, []);
 
+    useEffect(() => {
+        let cancelled = false;
+        (async () => {
+            try {
+                const res = await getCategoryList<any>();
+                if (!cancelled) setCategories(res?.data || []);
+            } catch (err) {
+                console.error("Navbar: error fetching categories:", err);
+            }
+        })();
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
     const isActive = (href: string, exact = false) =>
         exact ? pathname === href : pathname.startsWith(href);
 
+    // Builds the same href shape used by the category grid: /all-products/{name}/{id}
+    const getCategoryHref = (label: string): string | null => {
+        const targetName = CATEGORY_NAV_MAP[label];
+        if (!targetName) return null;
+        const match = categories.find(
+            (c) => c.name?.toLowerCase() === targetName.toLowerCase()
+        );
+        return match ? `/all-products/${match.name}/${match.id}` : null;
+    };
+
     const navLinks = [
         { label: "Home", href: "/", exact: true },
-        { label: "Womens", href: "/womens" },
-        { label: "Kids", href: "/kids" },
-        { label: "New Arrivals", href: "/new-arrivals" },
+        { label: "Shimmer" },
+        { label: "Saree Shaper" },
+        { label: "Ankle" },
     ];
+
+    const renderNavItem = (item: (typeof navLinks)[number]) => {
+        // "Home" keeps its static href/exact match behavior.
+        if (item.href) {
+            return (
+                <li className="nav-item" key={item.href}>
+                    <Link
+                        href={item.href}
+                        className={`nav-link ${isActive(item.href, item.exact) ? "active" : ""}`}
+                    >
+                        {item.label}
+                    </Link>
+                </li>
+            );
+        }
+
+        const href = getCategoryHref(item.label);
+
+        // Categories haven't loaded yet, or no match was found — render a
+        // disabled placeholder instead of a broken/guessed link.
+        if (!href) {
+            return (
+                <li className="nav-item" key={item.label}>
+                    <span className="nav-link disabled" aria-disabled="true">
+                        {item.label}
+                    </span>
+                </li>
+            );
+        }
+
+        return (
+            <li className="nav-item" key={item.label}>
+                <Link href={href} className={`nav-link ${isActive(href) ? "active" : ""}`}>
+                    {item.label}
+                </Link>
+            </li>
+        );
+    };
 
     return (
         <>
             <div className="free-shipping">
-                <h6 className="mb-0">Free Shipping on all orders above Rs. 599</h6>
+                <h6 className="mb-0">Free Shipping on all orders above Rs. 499</h6>
             </div>
 
             <nav className="navbar navbar-expand-lg">
@@ -58,16 +131,7 @@ export default function Navbar() {
                         </div>
 
                         <ul className="navbar-nav flex-row align-items-center justify-content-between mt-3 response-nav-content">
-                            {navLinks.map((item) => (
-                                <li className="nav-item" key={item.href}>
-                                    <Link
-                                        href={item.href}
-                                        className={`nav-link ${isActive(item.href, item.exact) ? "active" : ""}`}
-                                    >
-                                        {item.label}
-                                    </Link>
-                                </li>
-                            ))}
+                            {navLinks.map(renderNavItem)}
                         </ul>
                     </div>
 
@@ -80,16 +144,7 @@ export default function Navbar() {
                         </div>
 
                         <ul className="navbar-nav col-lg-5 align-items-lg-center justify-content-lg-evenly navbarNav">
-                            {navLinks.map((item) => (
-                                <li className="nav-item" key={item.href}>
-                                    <Link
-                                        href={item.href}
-                                        className={`nav-link ${isActive(item.href, item.exact) ? "active" : ""}`}
-                                    >
-                                        {item.label}
-                                    </Link>
-                                </li>
-                            ))}
+                            {navLinks.map(renderNavItem)}
                         </ul>
 
                         <ul className="navbar-nav col-lg-3 mb-0">

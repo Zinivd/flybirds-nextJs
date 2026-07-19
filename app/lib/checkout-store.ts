@@ -30,6 +30,7 @@ export function setOrderSummary(summary: CheckoutOrderSummary): void {
 }
 
 export function getOrderSummary(): CheckoutOrderSummary | null {
+  if (typeof window === "undefined") return null;
   const raw = sessionStorage.getItem(KEY);
   return raw ? JSON.parse(raw) : null;
 }
