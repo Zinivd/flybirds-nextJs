@@ -1,0 +1,352 @@
+.cart {
+    width: 90%;
+    margin: auto;
+}
+
+.cart-div {
+    display: grid;
+    justify-content: space-between;
+    align-items: start;
+    gap: 15px;
+}
+
+.web-div .cart-left,
+.web-div .cart-right {
+    border: 2px solid var(--border);
+    border-radius: 5px;
+}
+
+.table-div {
+    overflow-x: auto;
+    overflow-y: auto;
+}
+
+.table-div::-webkit-scrollbar {
+    /* width: 5px; */
+    display: none;
+}
+
+.table-div::-webkit-scrollbar-track {
+    background: var(--secondary);
+}
+
+.table-div::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
+}
+
+.table-div::-webkit-scrollbar-thumb:hover {
+    background: var(--main);
+}
+
+.product-cell {
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
+}
+
+.product-cell img {
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    object-fit: cover;
+}
+
+.product-cell h5 {
+    color: var(--text-primary);
+    font-weight: var(--fw-lg);
+}
+
+.product-cell h6 {
+    color: var(--text-secondary);
+    font-weight: var(--fw-md);
+}
+
+.product-cell a {
+    color: var(--text-secondary);
+    font-weight: var(--fw-md);
+}
+
+.product-cell a:hover {
+    color: var(--main);
+}
+
+.qty-div {
+    background: var(--secondary);
+    border: 2px solid var(--border);
+    border-radius: 5px;
+    display: grid;
+    grid-template-columns: 25% 50% 25%;
+    align-items: center;
+}
+
+.qty-div input {
+    height: 100%;
+    width: 100% !important;
+    text-align: center;
+    border: none;
+    padding: 8px !important;
+}
+
+.qty-btn {
+    height: 100%;
+    width: 100%;
+    background: var(--secondary);
+    color: var(--text-primary);
+    border: none;
+    font-weight: var(--fw-md);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.qty-btn:hover {
+    background: var(--main);
+    color: var(--secondary);
+}
+
+.qty-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.summary-list .summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 10px;
+    margin-bottom: 10px;
+}
+
+.summary-item h6 {
+    color: var(--text-secondary);
+    font-weight: var(--fw-sm);
+}
+
+.summary-item h5 {
+    color: var(--text-primary);
+    font-weight: var(--fw-md);
+}
+
+/* Coupon badge */
+.badge-coupon {
+    display: inline-block;
+    background: #e8f5e9;
+    color: var(--green);
+    font-weight: var(--fw-md);
+    padding: 2px 7px;
+    border-radius: 20px;
+    vertical-align: middle;
+}
+
+/* Applied coupon */
+.applied-coupon {
+    background: #f0fdf4;
+    border: 1px dashed var(--green);
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.applied-coupon h6 {
+    color: var(--green);
+    font-weight: var(--fw-md);
+}
+
+.remove-coupon {
+    cursor: pointer;
+    color: var(--fw-md);
+    font-weight: var(--fw-md);
+    text-decoration: none;
+}
+
+/* Free shipping nudge bar */
+.free-shipping-nudge {
+    background: #fff8e1;
+    border: 1px solid #ffe082;
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: var(--sub);
+    text-align: center;
+}
+
+.free-shipping-nudge.free-shipping-achieved {
+    background: #e8f5e9;
+    border-color: #a5d6a7;
+    color: var(--green);
+}
+
+.remove-link {
+    cursor: pointer;
+    color: var(--text-secondary);
+}
+
+.remove-link:hover {
+    color: var(--red);
+}
+
+.login-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media screen and (min-width: 1098px) {
+    .cart-div {
+        grid-template-columns: 70% 30%;
+    }
+
+    .web-div .cart-left,
+    .web-div .cart-right {
+        padding: 15px;
+    }
+
+    .table-div {
+        max-height: 300px;
+    }
+
+    .product-cell img {
+        height: 115px;
+        width: 115px;
+    }
+
+    .product-cell h5 {
+        font-size: 16px;
+    }
+
+    .product-cell h6,
+    .product-cell a,
+    .badge-coupon,
+    .applied-coupon h6,
+    .remove-coupon,
+    .free-shipping-nudge,
+    .remove-link,
+    .table input,
+    .table select {
+        font-size: 12px !important;
+    }
+
+    .table select,
+    .qty-div {
+        width: 125px;
+    }
+
+    .summary-item h6 {
+        font-size: 13px;
+    }
+
+    .summary-item h5 {
+        font-size: 15px;
+    }
+
+    .mobile-div {
+        display: none;
+    }
+
+}
+
+@media screen and (min-width: 767px) and (max-width: 1098px) {
+    .cart-div {
+        grid-template-columns: 70% 30%;
+    }
+
+    .web-div .cart-left,
+    .web-div .cart-right {
+        padding: 10px;
+    }
+
+    .table-div {
+        max-height: 300px;
+    }
+
+    .product-cell img {
+        height: 100px;
+        width: 100px;
+    }
+
+    .product-cell h5 {
+        font-size: 12px;
+    }
+
+    .product-cell h6,
+    .product-cell a,
+    .badge-coupon,
+    .applied-coupon h6,
+    .remove-coupon,
+    .free-shipping-nudge,
+    .remove-link,
+    .table input,
+    .table select {
+        font-size: 10px !important;
+    }
+
+    .table select,
+    .qty-div {
+        width: 100px;
+    }
+
+    .summary-item h6 {
+        font-size: 11px;
+    }
+
+    .summary-item h5 {
+        font-size: 12px;
+    }
+
+    .mobile-div {
+        display: none;
+    }
+
+}
+
+@media screen and (max-width: 767px) {
+    .cart-div {
+        grid-template-columns: 100%;
+        gap: 10px;
+    }
+
+    .mobile-div .cart-left,
+    .mobile-div .cart-right {
+        padding: 0px;
+    }
+
+    .product-cell img {
+        height: 110px;
+        width: 110px;
+    }
+
+    .product-cell h5 {
+        font-size: 12px;
+    }
+
+    .product-cell h6,
+    .product-cell a,
+    .badge-coupon,
+    .applied-coupon h6,
+    .remove-coupon,
+    .free-shipping-nudge,
+    .remove-link,
+    .table-div input,
+    .table-div select {
+        font-size: 10px;
+    }
+
+    .table-div select,
+    .qty-div {
+        width: 50%;
+    }
+
+    .summary-item h6 {
+        font-size: 11px;
+    }
+
+    .summary-item h5 {
+        font-size: 12px;
+    }
+
+    .web-div {
+        display: none;
+    }
+}

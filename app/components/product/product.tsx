@@ -5,6 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { ProductItem } from "@/app/types/shop.models";
 import { addToCart as addToCartApi } from "@/app/lib/api";
+import { toast } from "react-toastify";
 
 import "./product.css"
 
@@ -17,7 +18,7 @@ export default function Products({ product }: { product: ProductItem }) {
 
         const userId = localStorage.getItem("userId");
         if (!userId) {
-            alert("Please log in to add items to your bag.");
+            toast.info("Please log in to add items to your bag.");
             return;
         }
         if (addingToCart) return;
@@ -25,9 +26,9 @@ export default function Products({ product }: { product: ProductItem }) {
         setAddingToCart(true);
         try {
             await addToCartApi(userId, { product_id: product.id, quantity: 1 });
-            alert("Added to bag!");
+            toast.success("Added to bag!");
         } catch {
-            alert("Failed to add to bag.");
+            toast.error("Failed to add to bag.");
         } finally {
             setAddingToCart(false);
         }

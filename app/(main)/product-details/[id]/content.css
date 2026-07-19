@@ -1,0 +1,308 @@
+.product-content {
+    display: grid;
+    align-items: start;
+    justify-content: space-between;
+}
+
+.product-content-left {
+    display: grid;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.product-content-img {
+    background: #FAF1E6;
+    width: 100%;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.product-content-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: all var(--transition);
+}
+
+.product-box img:hover {
+    transform: scale(1.05);
+}
+
+/* Product Content Right */
+.product-content-right h2 {
+    color: var(--text-primary);
+    font-weight: var(--fw-lg);
+}
+
+.product-content-right h3 {
+    color: var(--text-primary);
+    font-weight: var(--fw-xl);
+}
+
+.product-content-right h3 span {
+    color: var(--text-secondary);
+    font-weight: var(--fw-md);
+}
+
+.product-content-right h4 {
+    color: var(--text-secondary);
+    font-weight: var(--fw-md);
+}
+
+.product-content-right h5 {
+    color: var(--text-primary);
+    font-weight: var(--fw-lg);
+}
+
+.product-content-right h6 {
+    color: var(--text-primary);
+    font-weight: var(--fw-md);
+}
+
+.product-content-right .colors-div,
+.product-content-right .sizes-div {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+/* Color swatch (round chip + label, like a "select family color" row) */
+.product-content-right .color-swatch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+}
+
+.product-content-right .color-swatch .color-box {
+    display: block;
+    border-radius: 50%;
+    transition: all var(--transition);
+}
+
+.product-content-right .color-swatch:hover .color-box,
+.product-content-right .color-swatch.active .color-box {
+    transform: scale(1.08);
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.product-content-right .color-swatch small {
+    color: var(--text-secondary);
+    font-size: 11px;
+    text-align: center;
+    max-width: 60px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Size buttons: rounded-rectangle pills, not circles */
+.product-content-right .size-btn {
+    background-color: var(--secondary);
+    color: var(--text-primary);
+    font-weight: var(--fw-md);
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.product-content-right .size-btn:hover,
+.product-content-right .size-btn.selected,
+.product-content-right .size-btn.active {
+    background-color: var(--main);
+    color: var(--secondary);
+    border: 2px solid var(--main);
+}
+
+.product-content-left::-webkit-scrollbar {
+    width: 8px;
+    height: 10px;
+    cursor: pointer !important;
+}
+
+.product-content-left::-webkit-scrollbar-track {
+    background: #f4f4f4;
+    border-radius: 10px;
+}
+
+.product-content-left::-webkit-scrollbar-thumb {
+    background-color: var(--main);
+    border-radius: 10px;
+    border: 2px solid #f4f4f4;
+}
+
+.product-content-left::-webkit-scrollbar-thumb:hover {
+    background-color: var(--main);
+}
+
+@media screen and (min-width: 1098px) {
+    .product-content {
+        grid-template-columns: 48% 48%;
+        column-gap: 30px;
+    }
+
+    .product-content-left {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .product-content-img {
+        height: 340px;
+    }
+
+    /* Product Content Right */
+    .product-content-right h2 {
+        font-size: 22px;
+    }
+
+    .product-content-right h3 {
+        font-size: 22px;
+    }
+
+    .product-content-right h3 span {
+        font-size: 16px;
+    }
+
+    .product-content-right h4 {
+        font-size: 14px;
+    }
+
+    .product-content-right h5 {
+        font-size: 14px;
+    }
+
+    .product-content-right h6 {
+        font-size: 13px;
+    }
+
+    .product-content-right .color-swatch .color-box {
+        width: 36px;
+        height: 36px;
+    }
+
+    .product-content-right .size-btn {
+        height: 42px;
+        min-width: 42px;
+        padding: 0 14px;
+        font-size: 13px;
+    }
+}
+
+@media screen and (min-width: 767px) and (max-width: 1098px) {
+    .product-content {
+        grid-template-columns: 48% 48%;
+        column-gap: 20px;
+    }
+
+    .product-content-left {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .product-content-img {
+        height: 320px;
+    }
+
+    .product-content-img img {
+        object-fit: cover;
+    }
+
+    /* Product Content Right */
+    .product-content-right h2 {
+        font-size: 19px;
+    }
+
+    .product-content-right h3 {
+        font-size: 19px;
+    }
+
+    .product-content-right h3 span {
+        font-size: 15px;
+    }
+
+    .product-content-right h4 {
+        font-size: 13px;
+    }
+
+    .product-content-right h5 {
+        font-size: 13px;
+    }
+
+    .product-content-right h6 {
+        font-size: 12px;
+    }
+
+    .product-content-right .color-swatch .color-box {
+        width: 30px;
+        height: 30px;
+    }
+
+    .product-content-right .size-btn {
+        height: 36px;
+        min-width: 36px;
+        padding: 0 12px;
+        font-size: 12px;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .product-content {
+        grid-template-columns: repeat(1, 1fr);
+        row-gap: 16px;
+    }
+
+    .product-content-left {
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(240px, 1fr);
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+
+    .product-content-img {
+        height: 280px;
+    }
+
+    /* Product Content Right */
+    .product-content-right h2 {
+        font-size: 19px;
+    }
+
+    .product-content-right h3 {
+        font-size: 19px;
+    }
+
+    .product-content-right h3 span {
+        font-size: 15px;
+    }
+
+    .product-content-right h4 {
+        font-size: 13px;
+    }
+
+    .product-content-right h5 {
+        font-size: 13px;
+    }
+
+    .product-content-right h6 {
+        font-size: 12px;
+    }
+
+    .product-content-right .color-swatch .color-box {
+        width: 30px;
+        height: 30px;
+    }
+
+    .product-content-right .size-btn {
+        height: 38px;
+        min-width: 38px;
+        padding: 0 12px;
+        font-size: 12px;
+    }
+}

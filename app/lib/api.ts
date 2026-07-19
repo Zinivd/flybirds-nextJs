@@ -264,3 +264,144 @@ export async function deleteAddress<T>(
   if (!res.ok) throw { error: data };
   return data;
 }
+
+export async function getColors<T>(): Promise<T> {
+  const res = await fetch(`${API_URL}/admin/attributes/colors`, {
+    headers: getHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw { error: data };
+  return data;
+}
+
+export async function getProducts<T>(params: Record<string, any>): Promise<T> {
+  const query = new URLSearchParams(
+    Object.entries(params).reduce(
+      (acc, [k, v]) => {
+        if (v !== undefined && v !== null && v !== "") acc[k] = String(v);
+        return acc;
+      },
+      {} as Record<string, string>,
+    ),
+  ).toString();
+
+  const res = await fetch(`${API_URL}/admin/products?${query}`, {
+    headers: getHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw { error: data };
+  return data;
+}
+
+export async function getProductById<T>(id: number): Promise<T> {
+  const res = await fetch(`${API_URL}/admin/products/${id}?id=${id}`, {
+    headers: getHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw { error: data };
+  return data;
+}
+
+export async function getSimilarProducts<T>(
+  productId: number | string,
+): Promise<T> {
+  const res = await fetch(`${API_URL}/admin/products/${productId}/similar`, {
+    headers: getHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw { error: data };
+  return data;
+}
+
+export async function getReviewsByProduct<T>(
+  productId: number | string,
+): Promise<T> {
+  const res = await fetch(`${API_URL}/products/${productId}/reviews`, {
+    headers: getHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw { error: data };
+  return data;
+}
+
+export async function createReview<T>(payload: any): Promise<T> {
+  const res = await fetch(`${API_URL}/reviews`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw { error: data };
+  return data;
+}
+
+export async function addToWishlist<T>(
+  userId: string,
+  payload: any,
+): Promise<T> {
+  const res = await fetch(`${API_URL}/admin/users/${userId}/wishlist`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw { error: data };
+  return data;
+}
+
+export async function addRecentlyViewed<T>(payload: any): Promise<T> {
+  const res = await fetch(`${API_URL}/recently-viewed`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw { error: data };
+  return data;
+}
+
+export async function getCart<T>(userId: string): Promise<T> {
+  const res = await fetch(`${API_URL}/admin/users/${userId}/cart`, {
+    headers: getHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw { error: data };
+  return data;
+}
+
+export async function updateCartItem<T>(
+  userId: string,
+  cartId: number,
+  payload: any,
+): Promise<T> {
+  const res = await fetch(`${API_URL}/admin/users/${userId}/cart/${cartId}`, {
+    method: "PATCH",
+    headers: getHeaders(),
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw { error: data };
+  return data;
+}
+
+export async function removeCartItem<T>(
+  userId: string,
+  cartId: number,
+): Promise<T> {
+  const res = await fetch(`${API_URL}/admin/users/${userId}/cart/${cartId}`, {
+    method: "DELETE",
+    headers: getHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw { error: data };
+  return data;
+}
+
+export async function getRecentlyViewed<T>(userId: string): Promise<T> {
+  const res = await fetch(`${API_URL}/recently-viewed/${userId}`, {
+    headers: getHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw { error: data };
+  return data;
+}
