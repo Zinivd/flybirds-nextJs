@@ -1,0 +1,135 @@
+.carousel-wrap {
+    width: 50%;
+    margin: 0px auto;
+    position: relative;
+}
+
+.carousel-track {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.testimonial-box {
+    font-family: var(--tertiary-font);
+    background-color: #E9047C10;
+    padding: 20px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 10px;
+    animation: fadeIn 0.35s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.testimonial-box h5 {
+    color: var(--text-primary);
+    font-size: 20px;
+    font-weight: var(--fw-md);
+}
+
+.testimonial-box h6 {
+    color: var(--text-secondary);
+    font-size: 16px;
+    font-weight: var(--fw-sm);
+}
+
+.stars i {
+    color: var(--yellow);
+    font-size: 20px;
+}
+
+.reviewer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    z-index: 2;
+    transition: background 0.15s;
+}
+
+.nav-btn:hover {
+    background: var(--main);
+    color: var(--secondary);
+}
+
+.nav-prev {
+    left: -48px;
+}
+
+.nav-next {
+    right: -48px;
+}
+
+@media screen and (min-width: 767px) and (max-width: 1098px) {
+    .carousel-wrap {
+        width: 70%;
+    }
+
+    .testimonial-box {
+        padding: 15px;
+    }
+
+    .testimonial-box h5 {
+        font-size: 18px;
+    }
+
+    .testimonial-box h6 {
+        font-size: 14px;
+    }
+
+    .stars i {
+        font-size: 18px;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .carousel-wrap {
+        width: 100%;
+    }
+
+    .testimonial-box {
+        padding: 15px;
+    }
+
+    .testimonial-box h5 {
+        font-size: 18px;
+    }
+
+    .testimonial-box h6 {
+        font-size: 14px;
+    }
+
+    .stars i {
+        font-size: 16px;
+    }
+}

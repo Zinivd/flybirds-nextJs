@@ -1,26 +1,8 @@
-@import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+@import url('../public/assets/css/button.css');
+@import url('../public/assets/css/empty.css');
+@import url('../public/assets/css/form.css');
+@import url('../public/assets/css/heading.css');
+@import url('../public/assets/css/list.css');
+@import url('../public/assets/css/style.css');
+@import url('../public/assets/css/toast.css');
+@import url('../public/assets/css/typography.css');

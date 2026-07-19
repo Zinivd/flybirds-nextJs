@@ -1,0 +1,36 @@
+.empty-component {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.empty-div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+}
+
+.empty-icon {
+    font-size: 50px;
+    margin-bottom: 10px;
+}
+
+.empty-div img {
+    height: 300px !important;
+}
+
+.empty-div h2 {
+    font-size: 20px;
+    font-weight: var(--fw-lg);
+    color: var(--sub);
+}
+
+.empty-div h6 {
+    font-size: 14px;
+    font-weight: var(--fw-md);
+    color: var(--text-primary);
+}

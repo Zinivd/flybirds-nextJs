@@ -1,0 +1,333 @@
+.login-btn {
+    background: var(--text-primary);
+    color: var(--secondary);
+    padding: 8px;
+    border: 2px solid var(--text-primary);
+    border-radius: 5px;
+    font-weight: var(--fw-md);
+    transition: all var(--transition);
+}
+
+.login-resend-btn {
+    background: var(--text-secondary);
+    color: var(--secondary);
+    padding: 8px;
+    border: 2px solid var(--text-secondary);
+    border-radius: 5px;
+    font-weight: var(--fw-md);
+    transition: all var(--transition);
+}
+
+.navbar-btn {
+    background: var(--main);
+    color: var(--secondary);
+    border: 2px solid var(--main);
+    padding: 6px 20px;
+    border-radius: 5px;
+    font-weight: var(--fw-md);
+    transition: all var(--transition);
+}
+
+.nav-icon-btn {
+    background: var(--secondary);
+    color: var(--text-primary);
+    height: 45px;
+    width: 45px;
+    font-size: 20px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    padding: 0px;
+    transition: all var(--transition);
+}
+
+.subscribe-btn {
+    background: var(--sub);
+    color: var(--secondary);
+    border: 2px solid var(--sub);
+    padding: 6px 20px;
+    border-radius: 5px;
+    font-weight: var(--fw-md);
+    transition: all var(--transition);
+}
+
+.tab-btn {
+    background: var(--secondary);
+    color: var(--text-primary);
+    border: 2px solid var(--border);
+    padding: 6px 25px;
+    border-radius: 20px;
+    font-weight: var(--fw-md);
+    transition: all var(--transition);
+}
+
+.add-cart-btn {
+    background: var(--main);
+    color: var(--secondary);
+    border: 2px solid var(--main);
+    padding: 6px 20px;
+    border-radius: 20px;
+    font-weight: var(--fw-md);
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.add-cart-btn-2 {
+    background: var(--main);
+    color: var(--secondary);
+    border: 2px solid var(--main);
+    padding: 6px 20px;
+    border-radius: 5px;
+    font-weight: var(--fw-md);
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.buy-btn {
+    background: var(--secondary);
+    color: var(--text-primary);
+    border: 2px solid var(--main);
+    padding: 7px 20px;
+    border-radius: 5px;
+    font-weight: var(--fw-md);
+    transition: all var(--transition);
+}
+
+.cart-btn {
+    background: var(--main);
+    color: var(--secondary);
+    border: 2px solid var(--main);
+    padding: 7px 20px;
+    border-radius: 5px;
+    font-weight: var(--fw-md);
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.form-btn {
+    background: var(--main);
+    color: var(--secondary);
+    border: 2px solid var(--main);
+    padding: 6px 20px;
+    border-radius: 5px;
+    font-weight: var(--fw-md);
+    transition: all var(--transition);
+}
+
+.filter-btn {
+    background-color: transparent;
+    color: var(--text-secondary);
+    font-size: 12px;
+    padding: 0px;
+    border: 2px solid transparent;
+    width: 100%;
+    font-weight: var(--fw-md);
+    border-radius: 5px;
+    display: grid;
+    grid-template-columns: 85% 15%;
+    justify-content: space-between;
+    align-items: center;
+    transition: var(--transition);
+}
+
+.size-btn {
+    background-color: var(--secondary);
+    color: var(--text-primary);
+    font-weight: var(--fw-md);
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.reset-btn {
+    background: var(--secondary);
+    color: var(--text-primary);
+    border: 2px solid var(--sub);
+    padding: 6px 20px;
+    border-radius: 5px;
+    font-weight: var(--fw-md);
+    transition: all var(--transition);
+}
+
+.profile-btn {
+    background: transparent;
+    color: var(--text-secondary);
+    border: none !important;
+    padding: 7px 20px;
+    border-radius: 5px;
+    font-weight: var(--fw-md);
+    transition: all var(--transition);
+}
+
+.banner-btn {
+    background: var(--secondary);
+    color: var(--main);
+    border: 2px solid var(--border);
+    padding: 9px 20px;
+    border-radius: 25px;
+    font-weight: var(--fw-md);
+    transition: all var(--transition);
+}
+
+/* Hover Effects */
+.login-btn:hover {
+    background: var(--main);
+    border: 2px solid var(--main);
+}
+
+.login-resend-btn:hover {
+    background: var(--secondary);
+    color: var(--text-primary);
+}
+
+.navbar-btn:hover {
+    background: var(--secondary);
+    color: var(--text-primary);
+}
+
+.nav-icon-btn:hover {
+    border: 2px solid var(--main);
+}
+
+.subscribe-btn:hover {
+    background: var(--secondary);
+    color: var(--text-primary);
+    border: 2px solid var(--sub);
+}
+
+.size-btn:hover,
+.size-btn.selected,
+.size-btn.activek {
+    background-color: var(--main);
+    color: var(--secondary);
+    border: 2px solid var(--main);
+}
+
+.tab-btn:hover,
+.tab-btn.active,
+.buy-btn:hover {
+    background: var(--main);
+    color: var(--secondary);
+    border: 2px solid var(--main);
+}
+
+.form-btn:hover,
+.add-cart-btn:hover,
+.add-cart-btn-2:hover,
+.cart-btn:hover {
+    background: var(--secondary);
+    color: var(--text-primary);
+}
+
+.reset-btn:hover {
+    background: var(--sub);
+    color: var(--secondary);
+}
+
+.profile-btn:hover,
+.profile-btn.active {
+    background: var(--main) !important;
+    color: var(--secondary) !important;
+}
+
+.banner-btn:hover {
+    background: var(--main);
+    color: var(--secondary);
+    border: 2px solid var(--main);
+}
+
+@media screen and (min-width: 1098px) {
+
+    .banner-btn,
+    .buy-btn,
+    .cart-btn {
+        font-size: 16px;
+    }
+
+    .login-btn,
+    .reset-btn,
+    .login-resend-btn,
+    .navbar-btn,
+    .subscribe-btn,
+    .tab-btn,
+    .add-cart-btn,
+    .add-cart-btn-2,
+    .profile-btn,
+    .form-btn {
+        font-size: 14px;
+    }
+
+    .size-btn {
+        height: 50px;
+        width: 50px;
+        font-size: 14px;
+    }
+}
+
+@media screen and (min-width: 767px) and (max-width: 1098px) {
+
+    .banner-btn,
+    .buy-btn,
+    .cart-btn {
+        font-size: 14px;
+    }
+
+    .login-btn,
+    .reset-btn,
+    .login-resend-btn,
+    .navbar-btn,
+    .subscribe-btn,
+    .tab-btn,
+    .add-cart-btn,
+    .add-cart-btn-2,
+    .profile-btn,
+    .form-btn {
+        font-size: 12px;
+    }
+
+    .size-btn {
+        height: 50px;
+        width: 50px;
+        font-size: 12px;
+    }
+}
+
+@media screen and (max-width: 767px) {
+
+    .banner-btn,
+    .login-btn,
+    .reset-btn,
+    .login-resend-btn,
+    .buy-btn,
+    .cart-btn {
+        font-size: 12px;
+    }
+
+    .navbar-btn,
+    .subscribe-btn,
+    .tab-btn,
+    .add-cart-btn,
+    .add-cart-btn-2,
+    .profile-btn,
+    .form-btn {
+        font-size: 12px;
+    }
+
+    .size-btn {
+        height: 35px;
+        width: 35px;
+        font-size: 12px;
+    }
+}

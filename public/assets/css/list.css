@@ -1,0 +1,101 @@
+.list-table {
+    background: var(--secondary);
+    box-shadow: var(--box-shadow);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 10px;
+}
+
+/* Table Wrapper */
+.table>:not(caption)>*>* {
+    background-color: transparent !important;
+}
+
+.table tbody tr:nth-child(odd),
+.table tbody tr:nth-child(even) {
+    background: var(--secondary) !important;
+}
+
+.table {
+    border-radius: 0px !important;
+}
+
+.table thead {
+    background-color: var(--secondary);
+    position: sticky !important;
+    top: 0px !important;
+}
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.table thead th {
+    color: var(--text-primary);
+    font-weight: var(--fw-md);
+    text-transform: capitalize;
+    cursor: pointer;
+    text-align: left !important;
+}
+
+.table tbody a {
+    transition: all 0.3s ease;
+}
+
+.table thead th,
+.table tbody td,
+.table tfoot td {
+    padding-block: 10px !important;
+}
+
+.table tbody td,
+.table tfoot td,
+.table tbody td span,
+.table tfoot td span {
+    color: var(--text-primary);
+    font-weight: var(--fw-sm);
+    text-align: left !important;
+}
+
+@media screen and (min-width: 1098px) {
+    .table thead th {
+        font-size: 14px;
+    }
+
+    .table tbody a,
+    .table tbody td,
+    .table tfoot td,
+    .table tbody td span,
+    .table tfoot td span {
+        font-size: 12px;
+    }
+
+    .table select,
+    .table input {
+        width: 125px;
+        padding: 5px;
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 1098px) {
+    .table thead th {
+        font-size: 12px;
+    }
+
+    .table tbody a,
+    .table tbody td,
+    .table tfoot td,
+    .table tbody td span,
+    .table tfoot td span {
+        font-size: 10px;
+    }
+
+    .table select,
+    .table input {
+        width: 100px;
+        padding: 5px;
+        font-size: 10px;
+    }
+}

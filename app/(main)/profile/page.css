@@ -1,0 +1,77 @@
+.profile {
+    width: 90%;
+    margin: auto;
+}
+
+.profile-div {
+    display: grid;
+    justify-content: space-between;
+    align-items: start;
+    gap: 15px;
+}
+
+.profile-left,
+.profile-right {
+    border: 2px solid var(--border);
+    border-radius: 5px;
+    padding: 15px;
+}
+
+@media screen and (min-width: 1098px) {
+    .profile-div {
+        grid-template-columns: 25% 75%;
+    }
+
+    .profile-left,
+    .profile-right {
+        padding: 15px;
+    }
+
+    .profile-tabs .nav-item,
+    .profile-tabs .profile-btn {
+        width: 100%;
+        text-align: left;
+    }
+}
+
+@media screen and (min-width: 767px) and (max-width: 1098px) {
+    .profile-div {
+        grid-template-columns: 25% 75%;
+    }
+
+    .profile-left,
+    .profile-right {
+        padding: 10px;
+    }
+
+    .profile-tabs .nav-item,
+    .profile-tabs .profile-btn {
+        width: 100%;
+        text-align: left;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .profile-div {
+        grid-template-columns: 100%;
+        gap: 30px;
+    }
+
+    .profile-left,
+    .profile-right {
+        padding: 15px 10px;
+    }
+
+    .profile-tabs {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        row-gap: 10px;
+        column-gap: 10px;
+    }
+
+    .profile-tabs .nav-item,
+    .profile-tabs .profile-btn {
+        width: 100%;
+        text-align: left;
+    }
+}

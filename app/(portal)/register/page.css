@@ -1,0 +1,308 @@
+.portal-main {
+    width: 100%;
+    height: 100vh;
+    background: url("/assets/images/Portal/BG.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.portal-div {
+    height: 100%;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    align-items: center;
+    justify-content: center;
+}
+
+.portal-left {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    justify-content: center;
+    align-items: start;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    margin-right: auto;
+}
+
+.portal-left h1 {
+    font-weight: var(--fw-xl);
+    color: var(--secondary);
+    display: flex;
+}
+
+.portal-right {
+    background: var(--secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin-left: auto;
+    border-radius: 20px;
+}
+
+.portal-right h4 {
+    font-weight: var(--fw-xl);
+    color: var(--text-primary);
+    text-align: center;
+}
+
+.portal-right h6 {
+    font-weight: var(--fw-md);
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.portal-right form label {
+    font-weight: var(--fw-md);
+    color: var(--text-quarterly);
+    margin-bottom: 5px;
+}
+
+.otp-container {
+    display: grid;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.otp-container input {
+    text-align: center;
+}
+
+@media screen and (min-width: 1439px) {
+
+    .portal-div {
+        width: 80%;
+    }
+
+    .portal-left {
+        width: 80%;
+        height: 500px;
+        gap: 30px;
+        padding: 20px;
+    }
+
+    .portal-left img {
+        height: 100%;
+    }
+
+    .portal-left h1 {
+        font-size: 35px;
+        margin-top: 30px;
+    }
+
+    .portal-right {
+        width: 90%;
+        height: 600px;
+        gap: 30px;
+        padding: 30px;
+    }
+
+    .portal-right img {
+        height: 70px;
+    }
+
+    .portal-right h4 {
+        font-size: 25px;
+    }
+
+    .portal-right h6,
+    .portal-right form label {
+        font-size: 16px;
+    }
+
+    .portal-right form input {
+        padding: 8px 15px;
+    }
+
+    .otp-container {
+        grid-template-columns: repeat(6, 60px);
+    }
+
+    .otp-container input {
+        height: 60px;
+        font-size: 25px;
+    }
+}
+
+@media screen and (min-width: 1098px) and (max-width: 1439px) {
+
+    .portal-div {
+        width: 80%;
+    }
+
+    .portal-left {
+        width: 85%;
+        height: 400px;
+        gap: 10px;
+        padding: 10px;
+    }
+
+    .portal-left img {
+        height: 100%;
+    }
+
+    .portal-left h1 {
+        font-size: 25px;
+        margin-top: 30px;
+    }
+
+    .portal-right {
+        width: 90%;
+        height: 500px;
+        gap: 20px;
+        padding: 20px 30px;
+    }
+
+    .portal-right img {
+        height: 60px;
+    }
+
+    .portal-right h4 {
+        font-size: 20px;
+    }
+
+    .portal-right h6,
+    .portal-right form label {
+        font-size: 14px;
+    }
+
+    .portal-right form input {
+        padding: 6px 15px;
+    }
+
+    .otp-container {
+        grid-template-columns: repeat(6, 50px);
+    }
+
+    .otp-container input {
+        height: 50px;
+        font-size: 20px;
+    }
+}
+
+@media screen and (min-width: 767px) and (max-width: 1098px) {
+
+    .portal-div {
+        width: 90%;
+    }
+
+    .portal-left {
+        width: 95%;
+        height: 350px;
+        gap: 10px;
+        padding: 10px;
+    }
+
+    .portal-left img {
+        height: 100%;
+    }
+
+    .portal-left h1 {
+        font-size: 25px;
+        margin-top: 30px;
+    }
+
+    .portal-right {
+        width: 100%;
+        height: 450px;
+        gap: 20px;
+        padding: 20px 30px;
+    }
+
+    .portal-right img {
+        height: 50px;
+    }
+
+    .portal-right h4 {
+        font-size: 18px;
+    }
+
+    .portal-right h6,
+    .portal-right form label {
+        font-size: 12px;
+    }
+
+    .portal-right form input {
+        padding: 4px 15px;
+    }
+
+    .otp-container {
+        grid-template-columns: repeat(6, 50px);
+    }
+
+    .otp-container input {
+        height: 50px;
+        font-size: 20px;
+    }
+}
+
+@media screen and (max-width: 767px) {
+
+    .portal-main {
+        height: 100%;
+        padding: 20px 0px;
+    }
+
+    .portal-div {
+        width: 95%;
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .portal-left {
+        width: 95%;
+        height: 250px;
+        gap: 10px;
+        padding: 10px;
+        margin: auto;
+    }
+
+    .portal-left img {
+        height: 100%;
+    }
+
+    .portal-left h1 {
+        font-size: 25px;
+        margin-top: 20px;
+    }
+
+    .portal-right {
+        width: 95%;
+        gap: 20px;
+        padding: 20px;
+        margin: auto;
+    }
+
+    .portal-right img {
+        height: 40px;
+    }
+
+    .portal-right h4 {
+        font-size: 16px;
+    }
+
+    .portal-right h6,
+    .portal-right form label {
+        font-size: 12px;
+    }
+
+    .portal-right form input {
+        padding: 4px 15px;
+    }
+
+    .otp-container {
+        grid-template-columns: repeat(6, 1fr);
+    }
+
+    .otp-container input {
+        font-size: 20px;
+    }
+}

@@ -1,0 +1,181 @@
+.collection-box {
+    width: 100%;
+    margin: auto;
+}
+
+/* background color cycle to match design (pink / grey / cream-yellow / cream-tan) */
+.collection-box:nth-child(4n+1) .collection-img {
+    background-color: #F6E9E6;
+}
+
+.collection-box:nth-child(4n+2) .collection-img {
+    background-color: #F4F5F6;
+}
+
+.collection-box:nth-child(4n+3) .collection-img {
+    background-color: #FFF2D9;
+}
+
+.collection-box:nth-child(4n+4) .collection-img {
+    background-color: #FAF1E6;
+}
+
+.collection-img {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.collection-box img {
+    width: 100%;
+    height: 90%;
+    object-fit: contain;
+    border-radius: 8px;
+    transition: all var(--transition);
+}
+
+.collection-box img:hover {
+    transform: scale(1.05);
+}
+
+.collection-grid {
+    display: grid;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+}
+
+.collection-box-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+/* Pill label button (e.g. "Ankle", "Shimmer") */
+.add-cart-btn-2 {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: 40px;
+    border: 1px solid var(--border);
+    background: #fff;
+    font-size: 15px;
+    font-weight: var(--fw-md);
+    text-align: left;
+    cursor: pointer;
+    transition: var(--transition);
+    color: #111;
+}
+
+.add-cart-btn-2:hover {
+    border-color: var(--main);
+    color: var(--main);
+}
+
+@media screen and (min-width: 1098px) {
+    .collection-grid {
+        grid-template-columns: repeat(3, 25%);
+    }
+
+    .collection-img {
+        height: 350px;
+    }
+}
+
+@media screen and (min-width: 767px) and (max-width: 1098px) {
+    .collection-grid {
+        grid-template-columns: repeat(3, 25%);
+    }
+
+    .collection-img {
+        height: 300px;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .collection-grid {
+        grid-template-columns: repeat(2, 48%);
+    }
+
+    .collection-img {
+        height: 300px;
+    }
+}
+
+/* Circular pink arrow button */
+.collection-btn {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition-duration: .3s;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.199);
+    background-color: var(--main);
+    flex-shrink: 0;
+}
+
+.collection-sign {
+    width: 100%;
+    transition-duration: .3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.collection-sign svg {
+    width: 18px;
+}
+
+.collection-sign svg path {
+    fill: var(--secondary);
+}
+
+.collection-text {
+    position: absolute;
+    right: 0%;
+    width: 0%;
+    opacity: 0;
+    color: var(--secondary);
+    font-size: 16px;
+    font-weight: var(--fw-md);
+    transition-duration: .3s;
+    white-space: nowrap;
+}
+
+.collection-box:hover .collection-btn,
+.collection-btn:hover {
+    width: 180px;
+    border-radius: 40px;
+    transition-duration: .3s;
+}
+
+.collection-box:hover .collection-sign,
+.collection-btn:hover .collection-sign {
+    width: 20%;
+    transition-duration: .3s;
+}
+
+.collection-box:hover .collection-text,
+.collection-btn:hover .collection-text {
+    opacity: 1;
+    width: 80%;
+    transition-duration: .3s;
+    padding-right: 10px;
+}
+
+.collection-box:hover .collection-btn,
+.collection-btn:active {
+    transform: translate(2px, 2px);
+}

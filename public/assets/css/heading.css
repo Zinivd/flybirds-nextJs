@@ -1,0 +1,121 @@
+.body-head h4 {
+    font-family: var(--secondary-font) !important;
+    color: var(--text-primary);
+    font-weight: var(--fw-xxl);
+    margin-bottom: 10px;
+}
+
+.body-head h5 {
+    font-family: var(--secondary-font) !important;
+    color: var(--text-primary);
+    font-weight: var(--fw-lg);
+    margin-bottom: 10px;
+}
+
+.body-head h6 {
+    font-family: var(--tertiary-font) !important;
+    color: var(--text-secondary);
+    font-weight: var(--fw-sm);
+    margin-bottom: 0px;
+    text-transform: capitalize;
+}
+
+.body-head h6 a {
+    color: var(--text-secondary);
+    font-weight: var(--fw-sm);
+}
+
+.body-head h6 a:hover {
+    color: var(--main) !important;
+}
+
+.body-head h6 a.active {
+    color: var(--text-primary);
+}
+
+.normal-small {
+    font-size: 12px;
+    font-weight: var(--fw-md);
+    color: var(--text-secondary);
+}
+
+.error-small {
+    font-size: 12px;
+    font-weight: var(--fw-md);
+    color: var(--red);
+}
+
+@media screen and (min-width: 1098px) {
+    .body-head h4 {
+        font-size: 24px;
+    }
+
+    .body-head h5 {
+        font-size: 18px;
+    }
+
+    .body-head h6 {
+        font-size: 16px;
+    }
+}
+
+@media screen and (min-width: 767px) and (max-width: 1098px) {
+    .body-head h4 {
+        font-size: 20px;
+    }
+
+    .body-head h5 {
+        font-size: 16px;
+    }
+
+    .body-head h6 {
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .body-head h4 {
+        font-size: 20px;
+    }
+
+    .body-head h5 {
+        font-size: 16px;
+    }
+
+    .body-head h6 {
+        font-size: 12px;
+    }
+}
+
+/* Text Colors */
+.text-main {
+    color: var(--main) !important;
+}
+
+.text-primary {
+    color: var(--text-primary) !important;
+}
+
+.text-secondary {
+    color: var(--text-secondary) !important;
+}
+
+.text-tertiary {
+    color: var(--text-tertiary) !important;
+}
+
+.text-success {
+    color: var(--green) !important;
+}
+
+.text-danger {
+    color: var(--red) !important;
+}
+
+.text-warning {
+    color: var(--yellow) !important;
+}
+
+.text-info {
+    color: var(--blue) !important;
+}

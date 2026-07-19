@@ -1,0 +1,149 @@
+.stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    gap: 15px;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.step-circle {
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--fw-lg);
+    background: #9C9CB6;
+    color: var(--secondary);
+    transition: background 0.2s, color 0.2s;
+}
+
+.step.done .step-circle,
+.step.active .step-circle {
+    background: linear-gradient(270deg, #E9047C 0%, #44122C 100%);
+    color: var(--secondary);
+}
+
+.step-label {
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.step.done .step-label,
+.step.active .step-label {
+    color: var(--text-primary);
+    font-weight: var(--fw-md);
+}
+
+/* Connector line */
+.connector {
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    border-radius: 1px;
+}
+
+.connector.done {
+    background: var(--main);
+}
+
+@media screen and (min-width: 1098px) {
+    .stepper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+        gap: 15px;
+    }
+
+    .step {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .step-circle {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .step-label {
+        font-size: 14px;
+    }
+
+    /* Connector line */
+    .connector {
+        min-width: 48px;
+        max-width: 80px;
+    }
+}
+
+@media screen and (min-width: 767px) and (max-width: 1098px) {
+    .stepper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .step {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .step-circle {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+
+    .step-label {
+        font-size: 12px;
+    }
+
+    /* Connector line */
+    .connector {
+        min-width: 40px;
+        max-width: 60px;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .stepper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .step {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .step-circle {
+        width: 25px;
+        height: 25px;
+        font-size: 12px;
+    }
+
+    .step-label {
+        font-size: 10px;
+    }
+
+    /* Connector line */
+    .connector {
+        min-width: 20px;
+        max-width: 60px;
+    }
+}

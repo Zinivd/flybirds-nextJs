@@ -1,0 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Jost:ital,wght@0,100..900;1,100..900&family=Public+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* Common CSS */
+:root {
+    /* Colors */
+    --main: #E9047C;
+    --sub: #521233;
+    --dark: #292933;
+    --light-bg: #F8F8FF;
+    --primary: #000;
+    --secondary: #fff;
+    --text-primary: #151515;
+    --text-secondary: #666666;
+    --text-tertiary: #ADADAD;
+    --text-quarterly: #3C4242;
+    --border: #E2E2E2;
+    --input-bg: #F6F6F6;
+    --green: #4F9A15;
+    --red: #DC2626;
+    --yellow: #FFBC02;
+    --purple: #8A1DEF;
+    --blue: #0369A1;
+    --radium: #65FDF4;
+    --brown: #362526;
+    --gray: #3C4242;
+    --pink: #FFB4DC;
+    --box-shadow: 0 0 0.875rem 0 rgba(33, 37, 41, 0.05);
+    --transition: 0.3s ease-in-out;
+
+    /* Fonts */
+    --primary-font: "Public Sans", sans-serif;
+    --secondary-font: "DM Sans", sans-serif;
+    --tertiary-font: "Jost", sans-serif;
+    --fw-ms: 300;
+    --fw-sm: 400;
+    --fw-md: 500;
+    --fw-lg: 600;
+    --fw-xl: 700;
+    --fw-xxl: 800;
+    --fw-xxxl: 900;
+}
+
+.bg-success {
+    background-color: var(--green) !important;
+}
+
+.bg-primary {
+    background-color: var(--main) !important;
+}
+
+.bg-warning {
+    background-color: var(--yellow) !important;
+}
+
+.bg-danger {
+    background-color: var(--red) !important;
+}
+
+.bg-info {
+    background-color: var(--blue) !important;
+}
+
+.bg-secondary {
+    background-color: var(--bg) !important;
+}
+
+.text-success {
+    color: var(--green) !important;
+}
+
+.text-primary {
+    color: var(--main) !important;
+}
+
+.text-warning {
+    color: var(--yellow) !important;
+}
+
+.text-danger {
+    color: var(--red) !important;
+}
+
+.text-info {
+    color: var(--blue) !important;
+}
+
+.text-secondary {
+    color: var(--text-secondary) !important;
+}
+
+.text-dark {
+    color: var(--text-dark) !important;
+}
+
+/* Badge */
+.badge {
+    font-size: 12px !important;
+    font-weight: var(--fw-md) !important;
+    padding: 7px 10px !important;
+    border-radius: 20px !important;
+}
+
+.badge-success {
+    background-color: #ECFDF5 !important;
+    color: var(--green) !important;
+    border: none !important;
+}
+
+.badge-warning {
+    background-color: #FFFBEB !important;
+    color: var(--yellow) !important;
+    border: none !important;
+}
+
+.badge-info {
+    background-color: #F0F9FF !important;
+    color: var(--blue) !important;
+    border: none !important;
+}
+
+.badge-danger {
+    background-color: #FFF1F2 !important;
+    color: var(--red) !important;
+    border: none !important;
+}
+
+.badge-secondary {
+    background-color: #F1F5F9 !important;
+    color: var(--text-dark) !important;
+    border: none !important;
+}

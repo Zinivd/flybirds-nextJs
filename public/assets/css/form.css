@@ -1,0 +1,119 @@
+.form label {
+    color: var(--text-secondary);
+    font-weight: var(--fw-md);
+    margin-bottom: 5px;
+}
+
+.form h5 {
+    color: var(--text-primary);
+    font-weight: var(--fw-lg);
+}
+
+.form h6 {
+    color: var(--text-primary);
+    font-weight: var(--fw-sm);
+}
+
+.form-control,
+.form-select {
+    background-color: var(--secondary) !important;
+    color: var(--text-primary);
+    border: 2px solid var(--border);
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: var(--fw-md);
+    padding: 6px 10px;
+    transition: all var(--transition);
+}
+
+.form-control:hover,
+.form-select:hover,
+.form-control:focus,
+.form-select:focus {
+    border: 2px solid var(--main);
+    outline: none;
+    box-shadow: none;
+}
+
+.form-control::placeholder {
+    font-size: 12px;
+}
+
+.input-double-flex,
+.input-repeat-double-flex,
+.input-triple-flex {
+    background: var(--secondary);
+    border: 2px solid var(--border);
+    border-radius: 5px;
+    display: grid;
+    align-items: center;
+}
+
+.input-double-flex:focus-within,
+.input-repeat-double-flex:focus-within,
+.input-triple-flex:focus-within,
+.input-double-flex:hover,
+.input-repeat-double-flex:hover,
+.input-triple-flex:hover {
+    border: 2px solid var(--main);
+}
+
+.input-double-flex {
+    grid-template-columns: 15% 85%;
+}
+
+.input-double-flex input {
+    border-radius: 0px 5px 5px 0px !important;
+}
+
+.input-repeat-double-flex {
+    grid-template-columns: 85% 15%;
+}
+
+.input-repeat-double-flex input {
+    border-radius: 0px 5px 5px 0px !important;
+}
+
+.input-triple-flex {
+    grid-template-columns: 15% 70% 15%;
+}
+
+.input-triple-flex input {
+    border-radius: 0px !important;
+}
+
+@media screen and (min-width: 1098px) {
+    .form h5 {
+        font-size: 18px;
+    }
+
+    .form h6 {
+        font-size: 16px;
+    }
+
+    .form label {
+        font-size: 14px;
+    }
+}
+
+@media screen and (min-width: 767px) and (max-width: 1098px) {
+    .form h5 {
+        font-size: 14px;
+    }
+
+    .form h6,
+    .form label {
+        font-size: 12px;
+    }
+}
+
+@media screen and (max-width: 1098px) {
+    .form h5 {
+        font-size: 14px;
+    }
+
+    .form h6,
+    .form label {
+        font-size: 12px;
+    }
+}

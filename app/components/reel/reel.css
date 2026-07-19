@@ -1,0 +1,151 @@
+.reel-box {
+    width: 100%;
+    margin: auto;
+}
+
+.reel-box:nth-child(4n+1) .reel-img {
+    background-color: #F1EEFA;
+}
+
+.reel-box:nth-child(4n+2) .reel-img {
+    background-color: #EAF6FF;
+}
+
+.reel-box:nth-child(4n+3) .reel-img {
+    background-color: #F2F5F7;
+}
+
+.reel-box:nth-child(4n+4) .reel-img {
+    background-color: #EEF4EE;
+}
+
+.reel-img {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.reel-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(30deg,
+            rgba(0, 0, 0, 0.552) 0%,
+            rgba(102, 102, 102, 0.2) 100%);
+    z-index: 1;
+}
+
+.reel-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    transition: all var(--transition);
+}
+
+.reel-box img:hover {
+    transform: scale(1.05);
+}
+
+.reel-box .reel-logo {
+    position: absolute;
+    top: 0%;
+    right: 0%;
+    height: 50px;
+    z-index: 2;
+}
+
+.reel-box h6 {
+    width: 100%;
+    color: var(--secondary);
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 2;
+}
+
+.reel-grid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: start;
+    gap: 25px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 30px;
+}
+
+.reel-grid::-webkit-scrollbar {
+    width: 8px;
+    height: 14px;
+    cursor: pointer !important;
+}
+
+.reel-grid::-webkit-scrollbar-track {
+    background: #f4f4f4;
+    border-radius: 10px;
+}
+
+.reel-grid::-webkit-scrollbar-thumb {
+    background-color: var(--main);
+    border-radius: 10px;
+    border: 3px solid #f4f4f4;
+}
+
+.reel-grid::-webkit-scrollbar-thumb:hover {
+    background-color: var(--main);
+}
+
+@media screen and (min-width: 1098px) {
+    .reel-img {
+        height: 400px;
+    }
+
+    .reel-grid .reel-box {
+        flex: 0 0 280px;
+        width: 280px;
+    }
+}
+
+@media screen and (min-width: 767px) and (max-width: 1098px) {
+    .reel-img {
+        height: 350px;
+    }
+
+    .reel-grid .reel-box {
+        flex: 0 0 200px;
+        width: 200px;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .reel-img {
+        height: 300px;
+    }
+
+    .reel-grid .reel-box {
+        flex: 0 0 200px;
+        width: 200px;
+    }
+}
+
+.reel-box video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    transition: all var(--transition);
+}
+
+.reel-box video:hover {
+    transform: scale(1.05);
+}
