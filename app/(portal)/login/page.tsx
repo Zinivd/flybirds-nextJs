@@ -1,23 +1,20 @@
 // app/(portal)/login/page.tsx
 "use client";
-
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { loginOtp, loginwithEmail } from "@/app/lib/api";
-
 import "./page.css";
 
-function isValidEmail(email: string) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+function isValidPhone(phone: string) {
+    return /^[0-9]{10}$/.test(phone);
 }
 
 export default function Login() {
     const router = useRouter();
-
     const [loginMode, setLoginMode] = useState<"otp" | "password">("otp");
-    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
@@ -30,19 +27,18 @@ export default function Login() {
     }
 
     async function sendOtp() {
-        if (!email.trim()) {
-            toast.error("Please enter your email ID");
+        if (!phone.trim()) {
+            toast.error("Please enter your phone number");
             return;
         }
-        if (!isValidEmail(email.trim())) {
-            toast.error("Please enter a valid email ID");
+        if (!isValidPhone(phone.trim())) {
+            toast.error("Please enter a valid 10-digit phone number");
             return;
         }
 
         setIsLoading(true);
         try {
-            const response = await loginOtp<any>({ login_field: email.trim() });
-
+            const response = await loginOtp<any>({ login_field: phone.trim() });
             const otpToken =
                 response?.login_otp_token ??
                 response?.data?.login_otp_token ??
@@ -54,12 +50,10 @@ export default function Login() {
             }
 
             toast.success("OTP sent successfully!");
-
             sessionStorage.setItem("otpToken", otpToken);
             sessionStorage.setItem("otpFlow", "login");
-            sessionStorage.setItem("registerEmail", email.trim());
+            sessionStorage.setItem("registerPhone", phone.trim());
             sessionStorage.removeItem("registerName");
-
             router.push("/otp");
         } catch (err: any) {
             toast.error(err?.error?.error?.message || err?.error?.message || "Failed to send OTP");
@@ -69,12 +63,12 @@ export default function Login() {
     }
 
     async function loginWithPassword() {
-        if (!email.trim()) {
-            toast.error("Please enter your email ID");
+        if (!phone.trim()) {
+            toast.error("Please enter your phone number");
             return;
         }
-        if (!isValidEmail(email.trim())) {
-            toast.error("Please enter a valid email ID");
+        if (!isValidPhone(phone.trim())) {
+            toast.error("Please enter a valid 10-digit phone number");
             return;
         }
         if (!password.trim()) {
@@ -84,7 +78,7 @@ export default function Login() {
 
         setIsLoading(true);
         try {
-            const response = await loginwithEmail<any>({ email: email.trim(), password });
+            const response = await loginwithEmail<any>({ login_field: phone.trim(), password });
 
             if (response?.access_token) localStorage.setItem("authToken", response.access_token);
             if (response?.refresh_token) localStorage.setItem("refreshToken", response.refresh_token);
@@ -97,7 +91,7 @@ export default function Login() {
             toast.success("Logged in successfully!");
             router.push("/");
         } catch (err: any) {
-            toast.error(err?.error?.error?.message || err?.error?.message || "Invalid email or password");
+            toast.error(err?.error?.error?.message || err?.error?.message || "Invalid phone number or password");
         } finally {
             setIsLoading(false);
         }
@@ -110,11 +104,9 @@ export default function Login() {
                     <img src="/assets/images/Portal/1.png" alt="Portal" />
                     <h1>&quot;Your vibe, your style Login &amp; fly now&quot;</h1>
                 </div>
-
                 <div className="portal-right">
                     <img src="/assets/images/Logo-Dark.png" alt="Logo" />
                     <h4>Login to unlock faster checkout and special deals!</h4>
-
                     <div className="nav nav-tabs profile-nav-pill border-0">
                         <button
                             type="button"
@@ -131,22 +123,21 @@ export default function Login() {
                             Login with Password
                         </button>
                     </div>
-
                     <div className="w-100">
                         <form onSubmit={(e) => e.preventDefault()}>
                             <div className="mb-3">
-                                <label htmlFor="email">Email ID <span>*</span></label>
+                                <label htmlFor="phone">Phone Number <span>*</span></label>
                                 <input
-                                    type="email"
+                                    type="tel"
                                     className="form-control"
-                                    name="email"
-                                    id="email"
-                                    placeholder="Enter your Email ID"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
+                                    name="phone"
+                                    id="phone"
+                                    placeholder="Enter your Phone Number"
+                                    value={phone}
+                                    maxLength={10}
+                                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
                                 />
                             </div>
-
                             {loginMode === "password" && (
                                 <div className="mb-3">
                                     <label htmlFor="password">Password <span>*</span></label>
@@ -161,17 +152,15 @@ export default function Login() {
                                     />
                                 </div>
                             )}
-
                             <div className="mb-3">
                                 <button type="button" className="login-btn w-100" onClick={submit} disabled={isLoading}>
-                                    {loginMode === "otp" && <i className="fa-solid fa-envelope me-2"></i>}
+                                    {loginMode === "otp" && <i className="fa-brands fa-whatsapp me-2"></i>}
                                     {loginMode === "password" && <i className="fa-solid fa-lock me-2"></i>}
                                     {isLoading
                                         ? loginMode === "otp" ? "Sending..." : "Logging in..."
-                                        : loginMode === "otp" ? "Send OTP via Email" : "Login"}
+                                        : loginMode === "otp" ? "Send OTP via WhatsApp" : "Login"}
                                 </button>
                             </div>
-
                             <div>
                                 <h6 className="mb-0">Didn&apos;t have an account? <Link href="/register">Register</Link></h6>
                             </div>

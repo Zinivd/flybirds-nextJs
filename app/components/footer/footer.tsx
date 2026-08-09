@@ -62,7 +62,10 @@ export default function Footer() {
     const [shopAllItems, setShopAllItems] = useState<ShopAllItem[]>([]);
     const [isShopAllLoading, setIsShopAllLoading] = useState(true);
 
+    const getcurrentyear = new Date().getFullYear();
+
     useEffect(() => {
+        // const getcurrentyear = new Date().getFullYear();
         loadCategories();
     }, []);
 
@@ -83,6 +86,9 @@ export default function Footer() {
             setIsShopAllLoading(false);
         }
     }
+
+
+
 
     return (
         <>
@@ -230,7 +236,8 @@ export default function Footer() {
                 </div>
 
                 <div className="footer-copyrights mt-3">
-                    <h6 className="text-center mb-0">© 2025 FLYBIRDS LEGGINGS All Rights Reserved.</h6>
+                    <h6 className="text-center mb-0">© {getcurrentyear} FLYBIRDS LEGGINGS All Rights Reserved.</h6>
+                    <h6 className="text-center mb-0">Design & Developed by <a href="https://www.zinivd.com/" target="_blank" className="text-white1">Zinivd</a></h6>
                 </div>
             </footer>
         </>

@@ -1,6 +1,5 @@
 // app/(main)/cart/page.tsx
 "use client";
-
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -9,7 +8,6 @@ import Products from "@/app/components/product/product";
 import { getCart, updateCartItem, removeCartItem, getRecentlyViewed } from "@/app/lib/api";
 import { setOrderSummary } from "@/app/lib/checkout-store";
 import { ProductItem } from "@/app/types/shop.models";
-
 import "./page.css";
 
 export interface CartItem {
@@ -33,26 +31,22 @@ export interface CartItem {
 }
 
 const TAX_RATE = 0.18;
-const FREE_SHIPPING_THRESHOLD = 999;
-const SHIPPING_CHARGE = 49;
 const DEFAULT_MAX_QTY = 10;
+const SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 const COUPONS: Record<string, number> = { SAVE10: 10, SAVE20: 20, FLAT50: 50 };
 
 function round2(value: number): number {
     return Math.round((value + Number.EPSILON) * 100) / 100;
 }
-
 function calcDiscountedPrice(mrp: number, discountType: "flat" | "percent" | null, discountValue: number): number {
     if (!discountType || !discountValue) return mrp;
     if (discountType === "flat") return Math.max(round2(mrp - discountValue), 0);
     if (discountType === "percent") return Math.max(round2(mrp - (mrp * discountValue) / 100), 0);
     return mrp;
 }
-
 function formatMoney(n: number): string {
     return n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
-
 function mapRecentlyViewed(row: any): ProductItem {
     const product = row.product || row;
     const firstVariant = product.color_variants?.[0];
@@ -75,13 +69,10 @@ function mapRecentlyViewed(row: any): ProductItem {
 
 export default function Cart() {
     const router = useRouter();
-
     const [loading, setLoading] = useState(true);
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
-
     const [products, setProducts] = useState<ProductItem[]>([]);
     const [isRecentlyViewedLoading, setIsRecentlyViewedLoading] = useState(true);
-
     const [couponCode, setCouponCode] = useState("");
     const [appliedCoupon, setAppliedCoupon] = useState("");
     const [couponError, setCouponError] = useState("");
@@ -108,12 +99,10 @@ export default function Cart() {
             const mapped: CartItem[] = items.map((row: any) => {
                 const variant = row.color_variant;
                 const sortedImages = variant?.gallery_images?.slice().sort((a: any, b: any) => a.sort_order - b.sort_order);
-
                 const mrp = round2(Number(row.product?.unit_price ?? 0));
                 const discountType = (row.product?.discount_type as "flat" | "percent" | null) ?? null;
                 const discountValue = Number(row.product?.discount ?? 0);
                 const price = calcDiscountedPrice(mrp, discountType, discountValue);
-
                 return {
                     id: row.id,
                     productId: row.product?.id ?? row.product_id,
@@ -170,9 +159,8 @@ export default function Cart() {
     const couponDiscountAmount = round2((postProductDiscountAmount * discountPercent) / 100);
     const discountAmount = round2(productDiscountTotal + couponDiscountAmount);
     const taxableAmount = round2(postProductDiscountAmount - couponDiscountAmount);
-    const shippingCharge = taxableAmount >= FREE_SHIPPING_THRESHOLD || cartItems.length === 0 ? 0 : SHIPPING_CHARGE;
     const taxAmount = round2(taxableAmount * TAX_RATE);
-    const total = round2(taxableAmount + taxAmount + shippingCharge);
+    const total = round2(taxableAmount + taxAmount);
     const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
     function itemTotal(item: CartItem): number {
@@ -190,7 +178,6 @@ export default function Cart() {
             toast.error("Failed to update quantity.");
         }
     }
-
     function increaseQty(item: CartItem) {
         if (item.quantity >= item.maxStock) return;
         const prev = item.quantity;
@@ -198,7 +185,6 @@ export default function Cart() {
         setCartItems((cur) => cur.map((i) => (i.id === item.id ? { ...i, quantity: next } : i)));
         syncQuantity(item.id, next, prev);
     }
-
     function decreaseQty(item: CartItem) {
         if (item.quantity <= 1) return;
         const prev = item.quantity;
@@ -206,7 +192,6 @@ export default function Cart() {
         setCartItems((cur) => cur.map((i) => (i.id === item.id ? { ...i, quantity: next } : i)));
         syncQuantity(item.id, next, prev);
     }
-
     function onQtyInput(item: CartItem, e: React.ChangeEvent<HTMLInputElement>) {
         const raw = parseInt(e.target.value, 10);
         const prev = item.quantity;
@@ -219,11 +204,26 @@ export default function Cart() {
         if (clamped !== prev) syncQuantity(item.id, clamped, prev);
     }
 
+    // ---------- Size ----------
+    async function onSizeChange(item: CartItem, e: React.ChangeEvent<HTMLSelectElement>) {
+        const newSize = e.target.value;
+        const prevSize = item.size;
+        if (!newSize || newSize === prevSize) return;
+        setCartItems((cur) => cur.map((i) => (i.id === item.id ? { ...i, size: newSize } : i)));
+        const uid = userId();
+        if (!uid) return;
+        try {
+            await updateCartItem(uid, item.id, { size: newSize });
+        } catch {
+            setCartItems((cur) => cur.map((i) => (i.id === item.id ? { ...i, size: prevSize } : i)));
+            toast.error("Failed to update size.");
+        }
+    }
+
     async function removeItem(id: number) {
         const uid = userId();
         if (!uid) return;
         const removed = cartItems.find((i) => i.id === id);
-
         setCartItems((prev) => {
             const next = prev.filter((item) => item.id !== id);
             if (next.length === 0) {
@@ -232,7 +232,6 @@ export default function Cart() {
             }
             return next;
         });
-
         try {
             await removeCartItem(uid, id);
             toast.success("Removed from cart");
@@ -258,7 +257,6 @@ export default function Cart() {
             setAppliedCoupon("");
         }
     }
-
     function removeCoupon() {
         setAppliedCoupon("");
         setCouponCode("");
@@ -287,7 +285,6 @@ export default function Cart() {
             })),
             subtotal,
             discountAmount,
-            shippingCharge,
             taxAmount,
             total,
             couponCode: appliedCoupon || undefined,
@@ -303,6 +300,23 @@ export default function Cart() {
             </div>
         );
     }
+
+    // Reusable size select block
+    const renderSizeSelect = (item: CartItem) =>
+        item.size ? (
+            <select className="form-select" value={item.size} disabled onChange={() => {}}>
+                <option value={item.size}>{item.size}</option>
+            </select>
+        ) : (
+            <select className="form-select" value={item.size} onChange={(e) => onSizeChange(item, e)}>
+                <option value="">Select Size</option>
+                {SIZES.map((s) => (
+                    <option key={s} value={s}>
+                        {s}
+                    </option>
+                ))}
+            </select>
+        );
 
     const orderSummaryBlock = (
         <div className="cart-right">
@@ -323,16 +337,6 @@ export default function Cart() {
                     </h6>
                     <h5 className="mb-0 text-success">
                         {discountAmount > 0 && <span>− </span>}₹{formatMoney(discountAmount)}
-                    </h5>
-                </div>
-                <div className="summary-item">
-                    <h6 className="mb-0">Shipping</h6>
-                    <h5 className="mb-0">
-                        {shippingCharge === 0 ? (
-                            <span className="text-success">Free</span>
-                        ) : (
-                            <span>₹{formatMoney(shippingCharge)}</span>
-                        )}
                     </h5>
                 </div>
                 <div className="summary-item">
@@ -364,7 +368,6 @@ export default function Cart() {
                     <a className="active">Cart</a>
                 </h6>
             </div>
-
             {/* Web layout */}
             <div className="cart-div web-div">
                 <div className="cart-left">
@@ -373,7 +376,6 @@ export default function Cart() {
                             Shopping Cart ({totalItems} {totalItems === 1 ? "item" : "items"})
                         </h5>
                     </div>
-
                     <div className="table-div">
                         {cartItems.length === 0 && (
                             <div className="text-center text-muted py-5">
@@ -382,7 +384,6 @@ export default function Cart() {
                                 <Link href="/all-products" className="form-btn">Browse Products</Link>
                             </div>
                         )}
-
                         {cartItems.length > 0 && (
                             <table className="table table-responsive mb-3">
                                 <thead>
@@ -417,11 +418,7 @@ export default function Cart() {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>
-                                                <select className="form-select" value={item.size} disabled onChange={() => { }}>
-                                                    <option value={item.size}>{item.size}</option>
-                                                </select>
-                                            </td>
+                                            <td>{renderSizeSelect(item)}</td>
                                             <td>
                                                 <div className="qty-div">
                                                     <button className="qty-btn" onClick={() => decreaseQty(item)} disabled={item.quantity <= 1}>
@@ -453,7 +450,6 @@ export default function Cart() {
                             </table>
                         )}
                     </div>
-
                     {cartItems.length > 0 && (
                         <div className="body-head mt-4">
                             <h6 className="mb-0">
@@ -462,10 +458,8 @@ export default function Cart() {
                         </div>
                     )}
                 </div>
-
                 {orderSummaryBlock}
             </div>
-
             {/* Mobile layout */}
             <div className="cart-div mobile-div">
                 <div className="cart-left">
@@ -474,7 +468,6 @@ export default function Cart() {
                             Shopping Cart ({totalItems} {totalItems === 1 ? "item" : "items"})
                         </h6>
                     </div>
-
                     {cartItems.length === 0 && (
                         <div className="empty-cart text-center py-5">
                             <i className="fa-solid fa-cart-shopping fa-3x text-muted mb-3"></i>
@@ -483,7 +476,6 @@ export default function Cart() {
                             <Link href="/all-products" className="login-btn">Browse Products</Link>
                         </div>
                     )}
-
                     <div className="table-div">
                         {cartItems.map((item) => (
                             <div className="mb-3" key={item.id}>
@@ -507,9 +499,7 @@ export default function Cart() {
                                     </div>
                                 </div>
                                 <div className="d-flex align-items-center justify-content-between gap-2">
-                                    <select className="form-select" value={item.size} disabled onChange={() => { }}>
-                                        <option value={item.size}>{item.size}</option>
-                                    </select>
+                                    {renderSizeSelect(item)}
                                     <div className="qty-div">
                                         <button className="qty-btn" onClick={() => decreaseQty(item)} disabled={item.quantity <= 1}>
                                             −
@@ -535,10 +525,8 @@ export default function Cart() {
                         ))}
                     </div>
                 </div>
-
                 {orderSummaryBlock}
             </div>
-
             {/* Recently Viewed */}
             <div className="product-main my-4">
                 <div className="product-div">

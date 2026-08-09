@@ -1,21 +1,18 @@
-// app/(main)/all-products/[categoryName]/[categoryId]/page.tsx
-"use client";
 
+
+"use client";
 import { useEffect, useState, useCallback } from "react";
-import { useParams } from "next/navigation";
 import Link from "next/link";
 import Products from "@/app/components/product/product";
 import FilterSidebar from "@/app/(main)/all-products/filter-sidebar/filter-sidebar";
 import { getCategoryList, getColors, getProducts } from "@/app/lib/api";
-
-import "./page.css";
+import "./all-products.css";
 
 interface Category {
     id: number;
     name: string;
     type: string;
 }
-
 interface Color {
     id: number;
     name: string;
@@ -25,38 +22,28 @@ interface Color {
 const MIN = 0;
 const MAX = 10000;
 const STEP = 10;
-
 const sortOptions = [
     { value: "0", label: "Default" },
     { value: "1", label: "Price : Low to High" },
     { value: "2", label: "Price : High to Low" },
 ];
-
 const sizes = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL"];
 
-export default function AllProducts() {
-    const params = useParams<{ categoryName: string; categoryId: string }>();
-    const categoryId = params.categoryId ? Number(params.categoryId) : null;
-    const categoryName = params.categoryName ? decodeURIComponent(params.categoryName) : "";
-
+export default function AllProductsIndex() {
     const [products, setProducts] = useState<any[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [colors, setColors] = useState<Color[]>([]);
-
-    const [selectedCategories, setSelectedCategories] = useState<number[]>(categoryId ? [categoryId] : []);
+    const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
     const [selectedColors, setSelectedColors] = useState<number[]>([]);
     const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-
     const [isLoading, setIsLoading] = useState(false);
     const [sortBy, setSortBy] = useState("0");
-
     const [openSections, setOpenSections] = useState<Record<string, boolean>>({
         category: false,
         price: false,
         color: false,
         size: false,
     });
-
     const [values, setValues] = useState<[number, number]>([0, 5000]);
 
     const loadProducts = useCallback(
@@ -79,6 +66,7 @@ export default function AllProducts() {
                 min_price: minV,
                 max_price: maxV,
             };
+            // No category_id sent at all when nothing is selected -> backend returns everything
             if (cats.length) queryParams.category_id = cats.join(",");
             if (cols.length) queryParams.color_id = cols.join(",");
             if (szs.length) queryParams.size = szs.join(",");
@@ -121,7 +109,7 @@ export default function AllProducts() {
                 });
                 setProducts(mapped);
             } catch {
-                // silent, matches Angular original
+                // silent
             } finally {
                 setIsLoading(false);
             }
@@ -146,60 +134,48 @@ export default function AllProducts() {
                 // silent
             }
         }
-
         loadCategories();
         loadColors();
-
-        const initialCats = categoryId ? [categoryId] : [];
-        setSelectedCategories(initialCats);
-        loadProducts({ categories: initialCats });
+        loadProducts({ categories: [] });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [categoryId]);
+    }, []);
 
     function toggleSection(section: string) {
         setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
     }
-
     function toggleCategory(id: number, checked: boolean) {
         const next = checked ? [...selectedCategories, id] : selectedCategories.filter((x) => x !== id);
         setSelectedCategories(next);
         loadProducts({ categories: next });
     }
-
     function toggleColor(id: number, checked: boolean) {
         const next = checked ? [...selectedColors, id] : selectedColors.filter((x) => x !== id);
         setSelectedColors(next);
         loadProducts({ colors: next });
     }
-
     function toggleSize(size: string, checked: boolean) {
         const next = checked ? [...selectedSizes, size] : selectedSizes.filter((x) => x !== size);
         setSelectedSizes(next);
         loadProducts({ sizes: next });
     }
-
     function onMinInput(value: string) {
         const next: [number, number] = [Math.min(+value, values[1]), values[1]];
         setValues(next);
         loadProducts({ priceValues: next });
     }
-
     function onMaxInput(value: string) {
         const next: [number, number] = [values[0], Math.max(+value, values[0])];
         setValues(next);
         loadProducts({ priceValues: next });
     }
-
     function resetFilters() {
-        const cats = categoryId ? [categoryId] : [];
-        setSelectedCategories(cats);
+        setSelectedCategories([]);
         setSelectedColors([]);
         setSelectedSizes([]);
         setValues([0, 5000]);
         setSortBy("0");
-        loadProducts({ categories: cats, colors: [], sizes: [], priceValues: [0, 5000], sort: "0" });
+        loadProducts({ categories: [], colors: [], sizes: [], priceValues: [0, 5000], sort: "0" });
     }
-
     function handleSortChange(value: string) {
         setSortBy(value);
         loadProducts({ sort: value });
@@ -243,12 +219,9 @@ export default function AllProducts() {
                     <Link href="/">Home
                         <i className="fas fa-chevron-right ps-1"></i>
                     </Link>
-                    <Link href="/all-products">All Products
-                        <i className="fas fa-chevron-right ps-1"></i>
-                    </Link>
-                    <a className="active">{categoryName}</a>
+                    <a className="active">All Products</a>
                 </h6>
-                <h4>{categoryName}</h4>
+                <h4>All Products</h4>
                 <div className="form select-div mb-3">
                     <label htmlFor="sort" className="me-2">Sort By : </label>
                     <select
@@ -265,7 +238,6 @@ export default function AllProducts() {
                     <i className="fas fa-sliders-h"></i> Filter
                 </button>
             </div>
-
             <div className="filter-product-flex">
                 <div className="filter-product-left">
                     <div className="filter-aside">
@@ -276,7 +248,6 @@ export default function AllProducts() {
                                 </ul>
                             </div>
                         </div>
-
                         <div
                             className="offcanvas offcanvas-bottom h-75 offcanvas-filter"
                             tabIndex={-1}
@@ -297,7 +268,6 @@ export default function AllProducts() {
                         </div>
                     </div>
                 </div>
-
                 <div className="filter-product-right">
                     {isLoading && (
                         <div className="loader-wrapper">
@@ -306,7 +276,6 @@ export default function AllProducts() {
                             </div>
                         </div>
                     )}
-
                     {!isLoading && products.length > 0 && (
                         <div className="filter-product-grid">
                             {products.map((item) => (
@@ -314,7 +283,6 @@ export default function AllProducts() {
                             ))}
                         </div>
                     )}
-
                     {!isLoading && products.length === 0 && (
                         <div className="text-center py-5">
                             <h5>No Products Found</h5>

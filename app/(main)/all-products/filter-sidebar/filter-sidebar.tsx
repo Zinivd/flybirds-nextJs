@@ -1,6 +1,4 @@
-// app/components/all-products/filter-sidebar.tsx
 "use client";
-
 import "./filter-sidebar.css";
 
 interface Category {
@@ -8,13 +6,11 @@ interface Category {
     name: string;
     type: string;
 }
-
 interface Color {
     id: number;
     name: string;
     code: string;
 }
-
 interface FilterSidebarProps {
     suffix: "desktop" | "mobile";
     categories: Category[];
@@ -62,14 +58,12 @@ export default function FilterSidebar({
 }: FilterSidebarProps) {
     return (
         <>
-            {/* Header */}
             <li className="mb-0">
                 <div className="body-head">
                     <h6 className="mb-0 text-dark text-uppercase filter-title">Filter By</h6>
                 </div>
             </li>
             <hr className="border-0" />
-
             {/* Sub Category */}
             <div className="filter-header mb-0">
                 <li
@@ -101,7 +95,6 @@ export default function FilterSidebar({
                     </div>
                 </div>
             </div>
-
             {/* Color */}
             <div className="filter-header mb-0">
                 <li
@@ -135,7 +128,6 @@ export default function FilterSidebar({
                     </div>
                 </div>
             </div>
-
             {/* Size */}
             <div className="filter-header mb-0">
                 <li
@@ -169,7 +161,6 @@ export default function FilterSidebar({
                     </div>
                 </div>
             </div>
-
             {/* Price */}
             <div className="filter-header mb-0">
                 <li
@@ -211,7 +202,6 @@ export default function FilterSidebar({
                     </div>
                 </div>
             </div>
-
             <div className="px-3 pt-3 pb-2">
                 <button className="btn btn-outline-secondary w-100" onClick={resetFilters}>
                     Reset

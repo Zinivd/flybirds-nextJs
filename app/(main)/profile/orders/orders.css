@@ -186,3 +186,71 @@
         font-size: 12px;
     }
 }
+
+
+
+/* AWB chip on order cards */
+.awb-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: var(--fw-md);
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: rgba(233, 4, 124, 0.08);
+    color: var(--main, #E9047C);
+    border: 1px solid rgba(233, 4, 124, 0.2);
+    white-space: nowrap;
+}
+
+/* Live tracking card */
+.tracking-card {
+    border-left: 3px solid var(--main, #E9047C);
+}
+.track-refresh-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: var(--fw-md);
+    color: var(--text-primary);
+    transition: all var(--transition);
+    cursor: pointer;
+}
+.track-refresh-btn:hover:not(:disabled) {
+    background: var(--main, #E9047C);
+    color: #fff;
+    border-color: var(--main, #E9047C);
+}
+.track-refresh-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+.tracking-status-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0 2px;
+}
+.tracking-status-row i {
+    font-size: 14px;
+}
+.tracking-ok i {
+    color: #16a34a;
+}
+.tracking-error i {
+    color: #dc2626;
+}
+.dot-loading {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--main, #E9047C);
+    animation: pulse-dot 1s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.1); }
+}

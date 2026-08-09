@@ -1,6 +1,5 @@
 // app/components/profile/info.tsx
 "use client";
-
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { getUserInfo, updateProfile } from "@/app/lib/api";
@@ -43,8 +42,11 @@ export default function Info() {
         if (!fullName.trim()) errs.fullName = "Full Name is required.";
         else if (fullName.trim().length < 2) errs.fullName = "Full Name is too short.";
 
-        if (!email.trim()) errs.email = "Email ID is required.";
-        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) errs.email = "Enter a valid email address.";
+        // Email is optional here (can be added later via profile),
+        // but if the user has typed something, validate its format.
+        if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+            errs.email = "Enter a valid email address.";
+        }
 
         return errs;
     }
@@ -58,11 +60,19 @@ export default function Info() {
         if (Object.keys(validate()).length > 0) return;
 
         try {
-            await updateProfile<any>(userId, { name: fullName });
+            const payload: { name: string; email?: string } = { name: fullName.trim() };
+
+            // Only include email in the payload if the user has entered one —
+            // avoids sending an empty string that could fail backend validation.
+            if (email.trim()) {
+                payload.email = email.trim();
+            }
+
+            await updateProfile<any>(userId, payload);
             toast.success("Profile updated successfully");
             loadUserInfo(userId);
-        } catch (err) {
-            toast.error("Profile update failed");
+        } catch (err: any) {
+            toast.error(err?.error?.error?.message || err?.error?.message || "Profile update failed");
         }
     }
 
@@ -77,7 +87,6 @@ export default function Info() {
                 <h5 className="mb-2 text-main">Personal Information</h5>
                 <h6 className="mb-0">Your Contact Info Helps us personalize your shopping experience.</h6>
             </div>
-
             <form className="form row row-gap-3" onSubmit={(e) => e.preventDefault()}>
                 <div className="col-md-6">
                     <label htmlFor="full-name">Full Name <span>*</span></label>
@@ -92,9 +101,8 @@ export default function Info() {
                     />
                     {isInvalid("fullName") && <small className="error-small">{getError("fullName")}</small>}
                 </div>
-
                 <div className="col-md-6">
-                    <label htmlFor="email">Email ID <span>*</span></label>
+                    <label htmlFor="email">Email ID</label>
                     <input
                         type="email"
                         className={`form-control ${isInvalid("email") ? "is-invalid" : ""}`}
@@ -106,7 +114,6 @@ export default function Info() {
                     />
                     {isInvalid("email") && <small className="error-small">{getError("email")}</small>}
                 </div>
-
                 <div className="col-md-12 d-flex justify-content-end gap-3">
                     <button className="form-btn" type="button" onClick={saveInfo}>Save Changes</button>
                     <button className="reset-btn" type="button" onClick={resetInfo}>Reset</button>

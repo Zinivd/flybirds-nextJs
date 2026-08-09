@@ -147,3 +147,14 @@
         max-width: 60px;
     }
 }
+
+
+
+.step.completed .step-circle {
+    background: var(--main, #E9047C);
+    color: #fff;
+    border-color: var(--main, #E9047C);
+}
+.connector.completed {
+    background: var(--main, #E9047C);
+}

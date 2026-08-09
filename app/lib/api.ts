@@ -1,6 +1,18 @@
-export const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "https://backend-dev.flybirdsleggings.com/api";
+// export const API_URL = "http://127.0.0.1:8000/api";
+export const API_URL = "https://backend-dev.flybirdsleggings.com/api";
+
+// ---------- Delhivery Tracking (customer-facing) ----------
+interface TrackOrderResponse {
+  status: "success" | "error";
+  message?: string;
+  data?: {
+    order_id: string;
+    shipment_status?: string; // "not_shipped" when no AWB yet
+    message?: string;
+    awb_number?: string;
+    delivery_status?: string;
+  };
+}
 
 function getHeaders(): HeadersInit {
   const token =
@@ -282,7 +294,6 @@ export async function getProducts<T>(params: Record<string, any>): Promise<T> {
       {} as Record<string, string>,
     ),
   ).toString();
-
   const res = await fetch(`${API_URL}/admin/products?${query}`, {
     headers: getHeaders(),
   });
@@ -433,6 +444,91 @@ export async function sentMail<T>(orderId: string | number): Promise<T> {
     method: "POST",
     headers: getHeaders(),
   });
+  const data = await res.json();
+  if (!res.ok) throw { error: data };
+  return data;
+}
+
+export async function checkPincodeAvailability<T>(pincode: string): Promise<T> {
+  const res = await fetch(`${API_URL}/user/delhivery/serviceability/${pincode}`, {
+    method: "GET",
+    headers: getHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw { error: data };
+  return data;
+}
+
+export async function getShippingCharges<T>(
+  destinationPincode: string,
+  weightGrams: number,
+  paymentMode: "COD" | "Prepaid" = "Prepaid",
+  codAmount: number = 0,
+): Promise<T> {
+  const originPin = "641603"; // your warehouse/pickup pincode — consider pulling from config/env instead of hardcoding here
+  const params = new URLSearchParams({
+    origin_pin: originPin,
+    destination_pin: destinationPincode,
+    weight: String(weightGrams),
+    payment_mode: paymentMode,
+    cod_amount: String(codAmount),
+  });
+  const res = await fetch(
+    `${API_URL}/user/delhivery/shipping-cost?${params.toString()}`,
+    {
+      method: "GET",
+      headers: getHeaders(),
+    },
+  );
+  const data = await res.json();
+  if (!res.ok) throw { error: data };
+  return data;
+}
+
+/**
+ * Confirms an order as Cash on Delivery — the COD counterpart to `verifyPayment`.
+ * Follows the same `/orders/{orderId}/...` pattern as `sentMail`.
+ * NOTE: rename/adjust the path if your backend exposes a different route for this.
+ */
+/**
+ * Confirms an order as Cash on Delivery.
+ * The backend (OrderController::confirmCod) recomputes the amount and
+ * shipping charge itself from the order's frozen subtotal/discount/tax —
+ * it never trusts client-supplied money values, so no payload is sent.
+ */
+export async function getShippingQuote<T>(
+  orderId: string | number,
+  paymentMethod: "cod" | "razorpay",
+): Promise<T> {
+  const res = await fetch(
+    `${API_URL}/orders/${orderId}/shipping-quote?payment_method=${paymentMethod}`,
+    { headers: getHeaders() },
+  );
+  const data = await res.json();
+  if (!res.ok) throw { error: data };
+  return data;
+}
+
+export async function confirmCodOrder<T>(orderId: string | number): Promise<T> {
+  const res = await fetch(`${API_URL}/orders/${orderId}/cod-confirm`, {
+    method: "POST",
+    headers: getHeaders(),
+  });
+  const data = await res.json();
+  if (!res.ok) throw { error: data };
+  return data;
+}
+
+
+
+export async function trackOrder<T = TrackOrderResponse>(
+  orderId: string,
+  userId: string,
+): Promise<T> {
+  const res = await fetch(
+    `${API_URL}/user/delhivery/track/${orderId}/${userId}`,
+    { headers: getHeaders() },
+  );
   const data = await res.json();
   if (!res.ok) throw { error: data };
   return data;

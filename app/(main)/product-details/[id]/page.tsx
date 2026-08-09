@@ -514,19 +514,19 @@ export default function ProductDetails() {
                         <hr />
 
                         {/* Check Delivery */}
-                        <h5 className="mb-3">Check Delivery</h5>
+                        {/* <h5 className="mb-3">Check Delivery</h5>
                         <div className="d-flex align-items-center justify-content-between gap-2 mb-4">
                             <input type="text" name="delivery" id="delivery" className="form-control w-75" placeholder="Enter Pincode" />
                             <button type="button" className="form-btn w-25">Check</button>
                         </div>
                         <h6 className="mb-4">
                             <i className="fas fa-truck-fast me-2"></i> Estimated delivery in {estimatedDelivery}
-                        </h6>
+                        </h6> */}
 
                         {/* Buttons */}
-                        <div className="d-flex align-items-center column-gap-2">
-                            <button className="buy-btn w-50" onClick={buyNow}>Buy Now</button>
-                            <button className="cart-btn w-50" onClick={addToBag}>
+                        <div className="d-flex align-items-center column-gap-1">
+                            {/* <button className="buy-btn w-50" onClick={buyNow}>Buy Now</button> */}
+                            <button className="cart-btn w-100" onClick={addToBag}>
                                 <i className="bx bx-shopping-bag"></i> Add to Bag
                             </button>
                         </div>

@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -9,13 +8,12 @@ import {
     deleteAddress,
     getUserInfo,
     createOrder,
+    checkPincodeAvailability,
 } from "@/app/lib/api";
 import { getOrderSummary, CheckoutOrderSummary } from "@/app/lib/checkout-store";
 import Stepper from "@/app/(main)/stepper/stepper";
 import { toast } from "react-toastify";
-
 import "./page.css";
-
 export interface Address {
     id: number;
     label: string;
@@ -29,7 +27,6 @@ export interface Address {
     type: "Home" | "Work" | "Other";
     isDefault: boolean;
 }
-
 interface AddressFormValues {
     name: string;
     mobile: string;
@@ -41,7 +38,6 @@ interface AddressFormValues {
     type: "Home" | "Work" | "Other";
     isDefault: boolean;
 }
-
 const EMPTY_FORM: AddressFormValues = {
     name: "",
     mobile: "",
@@ -53,9 +49,6 @@ const EMPTY_FORM: AddressFormValues = {
     type: "Home",
     isDefault: false,
 };
-
-const SERVICEABLE_PINCODES = ["636807", "641603", "641001", "600001", "560001"];
-
 function capitalize(s: string): "Home" | "Work" | "Other" {
     if (!s) return "Home";
     const v = s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
@@ -64,7 +57,6 @@ function capitalize(s: string): "Home" | "Work" | "Other" {
         | "Work"
         | "Other";
 }
-
 function mapAddress(row: any): Address {
     const type = capitalize(row.address_type);
     return {
@@ -81,7 +73,6 @@ function mapAddress(row: any): Address {
         isDefault: !!row.is_default,
     };
 }
-
 function toApiPayload(v: AddressFormValues) {
     return {
         full_name: v.name,
@@ -96,38 +87,34 @@ function toApiPayload(v: AddressFormValues) {
         is_default: v.isDefault,
     };
 }
-
 function validate(v: AddressFormValues) {
     const errors: Partial<Record<keyof AddressFormValues, string>> = {};
     if (!v.name.trim()) errors.name = "Name is required.";
     else if (v.name.trim().length < 2) errors.name = "Name is too short.";
-
     if (!v.mobile.trim()) errors.mobile = "Phone is required.";
     else if (!/^\+?[0-9\-]{10,15}$/.test(v.mobile))
         errors.mobile = "Enter a valid mobile number.";
-
     if (!v.addressLine1.trim())
         errors.addressLine1 = "Address Line 1 is required.";
     if (!v.city.trim()) errors.city = "City is required.";
     if (!v.state.trim()) errors.state = "State is required.";
-
     if (!v.pincode.trim()) errors.pincode = "Pincode is required.";
     else if (!/^[0-9]{6}$/.test(v.pincode))
         errors.pincode = "Pincode must be 6 digits.";
-
     return errors;
 }
-
 function getUserId(): string | null {
     if (typeof window === "undefined") return null;
     return localStorage.getItem("userId");
 }
-
+interface PincodeCheckResult {
+    serviceable: boolean;
+    codAvailable: boolean;
+    prepaidAvailable: boolean;
+}
 export default function CheckoutAddressPage() {
     const router = useRouter();
-
     const userId = useMemo(() => getUserId(), []);
-
     const [loadingAddresses, setLoadingAddresses] = useState(true);
     const [addresses, setAddresses] = useState<Address[]>([]);
     const [selectedAddressId, setSelectedAddressId] = useState<number>(-1);
@@ -137,35 +124,40 @@ export default function CheckoutAddressPage() {
     );
     const [saving, setSaving] = useState(false);
     const [creatingOrder, setCreatingOrder] = useState(false);
-
     const [form, setForm] = useState<AddressFormValues>(EMPTY_FORM);
     const [touched, setTouched] = useState<
         Partial<Record<keyof AddressFormValues, boolean>>
     >({});
     const [submitAttempted, setSubmitAttempted] = useState(false);
-
     const [pincodeStatus, setPincodeStatus] = useState<
         "available" | "unavailable" | null
     >(null);
+    const [pincodeResult, setPincodeResult] = useState<PincodeCheckResult | null>(
+        null,
+    );
     const [pincodeChecking, setPincodeChecking] = useState(false);
-
     const [customerEmail, setCustomerEmail] = useState("");
     const [customerName, setCustomerName] = useState("");
-
     const [orderSummary, setOrderSummary] = useState<CheckoutOrderSummary>({
         items: [],
         subtotal: 0,
         discountAmount: 0,
-        shippingCharge: 0,
         taxAmount: 0,
         total: 0,
     });
+
+    // ---------- Delivery availability check for the SELECTED address ----------
+    const [deliveryStatus, setDeliveryStatus] = useState<
+        "checking" | "available" | "unavailable" | null
+    >(null);
+    const [deliveryResult, setDeliveryResult] = useState<PincodeCheckResult | null>(
+        null,
+    );
 
     useEffect(() => {
         const summary = getOrderSummary();
         if (summary) setOrderSummary(summary);
     }, []);
-
     useEffect(() => {
         if (!userId) {
             setLoadingAddresses(false);
@@ -175,6 +167,19 @@ export default function CheckoutAddressPage() {
         loadUserInfo();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userId]);
+
+    // Runs right after addresses are loaded (selectedAddressId changes) and
+    // whenever the user picks a different saved address.
+    useEffect(() => {
+        const selected = addresses.find((a) => a.id === selectedAddressId);
+        if (!selected || !selected.pincode) {
+            setDeliveryStatus(null);
+            setDeliveryResult(null);
+            return;
+        }
+        checkAddressDeliverability(selected.pincode);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedAddressId, addresses]);
 
     function loadUserInfo() {
         if (!userId) return;
@@ -186,7 +191,6 @@ export default function CheckoutAddressPage() {
             })
             .catch(() => console.error("Failed to load user info for checkout."));
     }
-
     function loadAddresses() {
         if (!userId) {
             setLoadingAddresses(false);
@@ -205,12 +209,31 @@ export default function CheckoutAddressPage() {
             .finally(() => setLoadingAddresses(false));
     }
 
-    const totalItems = orderSummary.items.reduce((sum, i) => sum + i.qty, 0);
+    // ---------- Delhivery pincode serviceability check for selected address ----------
+    async function checkAddressDeliverability(pincode: string) {
+        setDeliveryStatus("checking");
+        setDeliveryResult(null);
+        try {
+            const res = await checkPincodeAvailability<any>(pincode);
+            const data = res?.data ?? res;
+            const result: PincodeCheckResult = {
+                serviceable: !!data?.serviceable,
+                codAvailable: !!data?.cod_available,
+                prepaidAvailable: !!data?.prepaid_available,
+            };
+            setDeliveryResult(result);
+            setDeliveryStatus(result.serviceable ? "available" : "unavailable");
+        } catch {
+            setDeliveryResult(null);
+            setDeliveryStatus(null);
+            toast.error("Could not verify delivery availability for this address.");
+        }
+    }
 
+    const totalItems = orderSummary.items.reduce((sum, i) => sum + i.qty, 0);
     function selectAddress(id: number) {
         setSelectedAddressId(id);
     }
-
     function setDefault(id: number) {
         if (!userId) return;
         const prev = addresses;
@@ -220,7 +243,6 @@ export default function CheckoutAddressPage() {
             toast.error("Failed to set default address.");
         });
     }
-
     function startEdit(address: Address) {
         setEditingAddressId(address.id);
         setForm({
@@ -237,9 +259,9 @@ export default function CheckoutAddressPage() {
         setTouched({});
         setSubmitAttempted(false);
         setPincodeStatus(null);
+        setPincodeResult(null);
         setShowAddressForm(true);
     }
-
     function removeAddress(id: number) {
         if (!userId) return;
         const removed = addresses.find((a) => a.id === id);
@@ -249,7 +271,6 @@ export default function CheckoutAddressPage() {
             const def = remaining.find((a) => a.isDefault) || remaining[0];
             setSelectedAddressId(def?.id ?? -1);
         }
-
         deleteAddress(userId, id)
             .then(() => toast.success("Address removed."))
             .catch(() => {
@@ -257,7 +278,6 @@ export default function CheckoutAddressPage() {
                 toast.error("Failed to delete address.");
             });
     }
-
     function toggleForm() {
         const next = !showAddressForm;
         setShowAddressForm(next);
@@ -267,18 +287,18 @@ export default function CheckoutAddressPage() {
             setTouched({});
             setSubmitAttempted(false);
             setPincodeStatus(null);
+            setPincodeResult(null);
         }
     }
-
     function cancelForm() {
         setShowAddressForm(false);
         setEditingAddressId(null);
         setPincodeStatus(null);
+        setPincodeResult(null);
         setForm(EMPTY_FORM);
         setTouched({});
         setSubmitAttempted(false);
     }
-
     function handleChange<K extends keyof AddressFormValues>(
         key: K,
         value: AddressFormValues[K],
@@ -286,21 +306,33 @@ export default function CheckoutAddressPage() {
         setForm((f) => ({ ...f, [key]: value }));
         if (key === "pincode") {
             setPincodeStatus(null);
+            setPincodeResult(null);
             const v = value as unknown as string;
             if (v.length === 6) checkPincodeDelivery(v);
         }
     }
-
-    function checkPincodeDelivery(pincode: string) {
+    // ---------- Delhivery pincode serviceability check (used inside the add/edit form) ----------
+    async function checkPincodeDelivery(pincode: string) {
         setPincodeChecking(true);
-        setTimeout(() => {
-            setPincodeStatus(
-                SERVICEABLE_PINCODES.includes(pincode) ? "available" : "unavailable",
-            );
+        setPincodeStatus(null);
+        try {
+            const res = await checkPincodeAvailability<any>(pincode);
+            const data = res?.data ?? res;
+            const result: PincodeCheckResult = {
+                serviceable: !!data?.serviceable,
+                codAvailable: !!data?.cod_available,
+                prepaidAvailable: !!data?.prepaid_available,
+            };
+            setPincodeResult(result);
+            setPincodeStatus(result.serviceable ? "available" : "unavailable");
+        } catch {
+            setPincodeResult(null);
+            setPincodeStatus(null);
+            toast.error("Could not verify delivery for this pincode. Please try again.");
+        } finally {
             setPincodeChecking(false);
-        }, 600);
+        }
     }
-
     const errors = validate(form);
     function isInvalid(field: keyof AddressFormValues) {
         return !!errors[field] && (touched[field] || submitAttempted);
@@ -308,20 +340,20 @@ export default function CheckoutAddressPage() {
     function getError(field: keyof AddressFormValues) {
         return isInvalid(field) ? errors[field] : "";
     }
-
     function saveAddress() {
         setSubmitAttempted(true);
         if (Object.keys(errors).length > 0) return;
+        if (pincodeStatus === "unavailable") {
+            toast.error("Delivery is not available for this pincode.");
+            return;
+        }
         if (!userId) return;
-
         const payload = toApiPayload(form);
         setSaving(true);
-
         const request =
             editingAddressId !== null
                 ? updateAddress(userId, editingAddressId, payload)
                 : addAddress(userId, payload);
-
         request
             .then(() => {
                 toast.success(
@@ -333,24 +365,24 @@ export default function CheckoutAddressPage() {
             .catch(() => toast.error("Failed to save address."))
             .finally(() => setSaving(false));
     }
-
     function proceedToPayment() {
         const selected = addresses.find((a) => a.id === selectedAddressId);
         if (!selected) {
             toast.error("Please select a delivery address.");
             return;
         }
+        if (deliveryStatus !== "available") {
+            toast.error("Delivery is not available for this address.");
+            return;
+        }
         if (!userId || creatingOrder) return;
-
         const items = orderSummary.items;
         if (!items.length) {
             toast.error("Your cart is empty.");
             return;
         }
-
         const addressString = `${selected.addressLine1}, ${selected.addressLine2 ? selected.addressLine2 + ", " : ""
             }${selected.city}, ${selected.state} - ${selected.pincode}`;
-
         const payload = {
             user_id: userId,
             customer_name: selected.name || customerName,
@@ -361,7 +393,6 @@ export default function CheckoutAddressPage() {
             shipping_address: addressString,
             billing_address: addressString,
             discount: orderSummary.discountAmount,
-            shipping_charge: orderSummary.shippingCharge,
             tax: orderSummary.taxAmount,
             items: items.map((i) => ({
                 product_id: i.productId,
@@ -370,7 +401,6 @@ export default function CheckoutAddressPage() {
                 quantity: i.qty,
             })),
         };
-
         setCreatingOrder(true);
         createOrder<any>(payload)
             .then((res) => {
@@ -384,7 +414,6 @@ export default function CheckoutAddressPage() {
             .catch(() => toast.error("Failed to create order. Please try again."))
             .finally(() => setCreatingOrder(false));
     }
-
     if (loadingAddresses) {
         return (
             <div className="text-center py-5">
@@ -393,11 +422,9 @@ export default function CheckoutAddressPage() {
             </div>
         );
     }
-
     return (
         <div className="checkout my-4">
             <Stepper current={1} />
-
             <div className="checkout-div">
                 <div className="checkout-left">
                     {addresses.length > 0 && (
@@ -405,7 +432,6 @@ export default function CheckoutAddressPage() {
                             <div className="body-head mb-3">
                                 <h5 className="mb-0">Select Delivery Address</h5>
                             </div>
-
                             {addresses.map((address) => (
                                 <div
                                     key={address.id}
@@ -434,6 +460,41 @@ export default function CheckoutAddressPage() {
                                             {address.addressLine2 ? address.addressLine2 + ", " : ""}
                                             {address.city}, {address.state} - {address.pincode}.
                                         </h6>
+                                        {selectedAddressId === address.id && (
+                                            <>
+                                                {deliveryStatus === "checking" && (
+                                                    <small className="normal-small d-block mb-2">
+                                                        <i className="fa-solid fa-spinner fa-spin me-1" />{" "}
+                                                        Checking delivery availability...
+                                                    </small>
+                                                )}
+                                                {deliveryStatus === "available" && (
+                                                    <small className="normal-small text-success d-block mb-2">
+                                                        <i className="fa-solid fa-circle-check me-1" />{" "}
+                                                        Delivery available for this address
+                                                        {deliveryResult && (
+                                                            <>
+                                                                {" "}
+                                                                (
+                                                                {deliveryResult.codAvailable
+                                                                    ? "COD"
+                                                                    : "No COD"}
+                                                                {deliveryResult.prepaidAvailable
+                                                                    ? ", Prepaid"
+                                                                    : ""}
+                                                                )
+                                                            </>
+                                                        )}
+                                                    </small>
+                                                )}
+                                                {deliveryStatus === "unavailable" && (
+                                                    <small className="error-small d-block mb-2">
+                                                        <i className="fa-solid fa-circle-xmark me-1" />{" "}
+                                                        Delivery not available for this address
+                                                    </small>
+                                                )}
+                                            </>
+                                        )}
                                         <div
                                             className="d-flex align-items-center gap-3"
                                             onClick={(e) => e.stopPropagation()}
@@ -473,20 +534,17 @@ export default function CheckoutAddressPage() {
                             ))}
                         </div>
                     )}
-
                     {addresses.length === 0 && (
                         <div className="text-center text-muted py-5">
                             <i className="fa-solid fa-location-dot fa-2x mb-3 text-muted" />
                             <p className="mb-2">Your address is empty.</p>
                         </div>
                     )}
-
                     <div className="divider mb-4">
                         <div className="divider-line" />
                         <h6 className="mb-0">{showAddressForm ? "Cancel" : "OR"}</h6>
                         <div className="divider-line" />
                     </div>
-
                     {!showAddressForm && (
                         <div className="mb-3">
                             <button className="login-btn w-100" onClick={toggleForm}>
@@ -494,7 +552,6 @@ export default function CheckoutAddressPage() {
                             </button>
                         </div>
                     )}
-
                     {showAddressForm && (
                         <div className="address-form">
                             <div className="body-head mb-3">
@@ -504,7 +561,6 @@ export default function CheckoutAddressPage() {
                                         : "Add New Address"}
                                 </h5>
                             </div>
-
                             <form
                                 className="form row row-gap-3"
                                 onSubmit={(e) => e.preventDefault()}
@@ -524,7 +580,6 @@ export default function CheckoutAddressPage() {
                                     />
                                     <small className="error-small">{getError("name")}</small>
                                 </div>
-
                                 <div className="col-md-6">
                                     <label htmlFor="address-phone">
                                         Mobile Number <span>*</span>
@@ -540,7 +595,6 @@ export default function CheckoutAddressPage() {
                                     />
                                     <small className="error-small">{getError("mobile")}</small>
                                 </div>
-
                                 <div className="col-md-12">
                                     <label htmlFor="address-line1">
                                         Address Line 1 <span>*</span>
@@ -562,7 +616,6 @@ export default function CheckoutAddressPage() {
                                         {getError("addressLine1")}
                                     </small>
                                 </div>
-
                                 <div className="col-md-12">
                                     <label htmlFor="address-line2">Address Line 2</label>
                                     <input
@@ -576,7 +629,6 @@ export default function CheckoutAddressPage() {
                                         }
                                     />
                                 </div>
-
                                 <div className="col-md-4">
                                     <label htmlFor="address-city">
                                         City <span>*</span>
@@ -592,7 +644,6 @@ export default function CheckoutAddressPage() {
                                     />
                                     <small className="error-small">{getError("city")}</small>
                                 </div>
-
                                 <div className="col-md-4">
                                     <label htmlFor="address-state">
                                         State <span>*</span>
@@ -608,7 +659,6 @@ export default function CheckoutAddressPage() {
                                     />
                                     <small className="error-small">{getError("state")}</small>
                                 </div>
-
                                 <div className="col-md-4">
                                     <label htmlFor="address-pincode">
                                         Pincode <span>*</span>
@@ -634,6 +684,13 @@ export default function CheckoutAddressPage() {
                                         <small className="normal-small text-success">
                                             <i className="fa-solid fa-circle-check me-1" /> Delivery
                                             available for this pincode
+                                            {pincodeResult && (
+                                                <>
+                                                    {" "}
+                                                    ({pincodeResult.codAvailable ? "COD" : "No COD"}
+                                                    {pincodeResult.prepaidAvailable ? ", Prepaid" : ""})
+                                                </>
+                                            )}
                                         </small>
                                     )}
                                     {pincodeStatus === "unavailable" && !pincodeChecking && (
@@ -643,7 +700,6 @@ export default function CheckoutAddressPage() {
                                         </small>
                                     )}
                                 </div>
-
                                 <div className="col-md-12 d-flex align-items-center justify-content-start column-gap-4">
                                     {(["Home", "Work", "Other"] as const).map((type) => (
                                         <div className="form-check" key={type}>
@@ -660,7 +716,6 @@ export default function CheckoutAddressPage() {
                                         </div>
                                     ))}
                                 </div>
-
                                 <div className="col-md-12">
                                     <div className="form-check">
                                         <input
@@ -677,12 +732,11 @@ export default function CheckoutAddressPage() {
                                         </label>
                                     </div>
                                 </div>
-
                                 <div className="col-md-12 d-flex gap-3">
                                     <button
                                         type="button"
                                         className="login-btn flex-grow-1"
-                                        disabled={saving}
+                                        disabled={saving || pincodeChecking}
                                         onClick={saveAddress}
                                     >
                                         {saving
@@ -696,7 +750,6 @@ export default function CheckoutAddressPage() {
                         </div>
                     )}
                 </div>
-
                 <div className="checkout-right h-auto">
                     <div className="body-head mb-4">
                         <h5 className="mb-0">Order Summary</h5>
@@ -704,7 +757,6 @@ export default function CheckoutAddressPage() {
                             {totalItems} {totalItems === 1 ? "item" : "items"}
                         </small>
                     </div>
-
                     <div className="summary-list">
                         {orderSummary.items.map((item, idx) => (
                             <div className="summary-item" key={idx}>
@@ -732,16 +784,6 @@ export default function CheckoutAddressPage() {
                             </h5>
                         </div>
                         <div className="summary-item">
-                            <h6 className="mb-0">Shipping</h6>
-                            <h5 className="mb-0">
-                                {orderSummary.shippingCharge === 0 ? (
-                                    <span className="text-success">Free</span>
-                                ) : (
-                                    <span>₹{orderSummary.shippingCharge}</span>
-                                )}
-                            </h5>
-                        </div>
-                        <div className="summary-item">
                             <h6 className="mb-0">Tax (GST 18%)</h6>
                             <h5 className="mb-0">₹{orderSummary.taxAmount}</h5>
                         </div>
@@ -750,17 +792,46 @@ export default function CheckoutAddressPage() {
                             <h6 className="mb-0 text-danger fw-bold">Total</h6>
                             <h5 className="mb-0 fw-bold">₹{orderSummary.total}</h5>
                         </div>
-                        <button
-                            className="login-btn w-100"
-                            disabled={
-                                selectedAddressId === -1 ||
-                                addresses.length === 0 ||
-                                creatingOrder
-                            }
-                            onClick={proceedToPayment}
-                        >
-                            {creatingOrder ? "Placing Order..." : "Proceed to Payment"}
-                        </button>
+
+                        {/* Only show Proceed to Payment when the selected address IS deliverable. */}
+                        {deliveryStatus === "available" && (
+                            <button
+                                className="login-btn w-100"
+                                disabled={
+                                    selectedAddressId === -1 ||
+                                    addresses.length === 0 ||
+                                    creatingOrder
+                                }
+                                onClick={proceedToPayment}
+                            >
+                                {creatingOrder ? "Placing Order..." : "Proceed to Payment"}
+                            </button>
+                        )}
+
+                        {/* Selected address is not serviceable: hide payment, prompt to add a new one. */}
+                        {deliveryStatus === "unavailable" && (
+                            <div className="alert alert-danger text-center mb-0" role="alert">
+                                <i className="fa-solid fa-circle-xmark me-1" /> Delivery is not
+                                available to this address. Please add a new address to
+                                continue.
+                            </div>
+                        )}
+
+                        {/* Still checking the selected address's pincode. */}
+                        {deliveryStatus === "checking" && (
+                            <button className="login-btn w-100" disabled>
+                                <i className="fa-solid fa-spinner fa-spin me-2" /> Checking
+                                delivery...
+                            </button>
+                        )}
+
+                        {/* No address selected yet / status unknown. */}
+                        {deliveryStatus === null && (
+                            <button className="login-btn w-100" disabled>
+                                Proceed to Payment
+                            </button>
+                        )}
+
                         <hr className="my-3" />
                         <div className="summary-item d-flex align-items-center justify-content-center flex-wrap gap-4">
                             <h6 className="mb-0">

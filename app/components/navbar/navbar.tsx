@@ -10,9 +10,9 @@ import { CategoryItem } from "@/app/types/shop.models";
 import "./navbar.css"
 
 const CATEGORY_NAV_MAP: Record<string, string> = {
-    "Shimmer": "Shimmer legging",
-    "Saree Shaper": "Saree Shaper",
-    "Ankle": "Ankle legging",
+    "shimmer": "shimmer",
+    "Saree shapper": "Saree shapper",
+    "Ankle leggings": "Ankle leggings",
 };
 
 export default function Navbar() {
@@ -54,10 +54,14 @@ export default function Navbar() {
 
     const navLinks = [
         { label: "Home", href: "/", exact: true },
-        { label: "Shimmer" },
-        { label: "Saree Shaper" },
-        { label: "Ankle" },
+        { label: "Shimmer"  , href: getCategoryHref("shimmer") },
+        { label: "Saree Shaper", href: getCategoryHref("Saree shapper") }, 
+        { label: "Ankle", href: getCategoryHref("Ankle leggings") },
     ];
+
+    //  href:"/all-products/shimmer/3"
+    //  href:"/all-products/Saree shapper/4"
+    // href:"/all-products/Ankle leggings/1"
 
     const renderNavItem = (item: (typeof navLinks)[number]) => {
         // "Home" keeps its static href/exact match behavior.

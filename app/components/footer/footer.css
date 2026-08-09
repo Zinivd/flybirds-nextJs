@@ -150,6 +150,9 @@
 .footer-copyrights {
     background: var(--sub);
     padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .footer-copyrights h6 {
@@ -377,4 +380,9 @@
         font-size: 16px !important;
     }
 
+}
+
+
+.text-white1{
+    color: #E96256 !important; 
 }
