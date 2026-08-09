@@ -77,7 +77,7 @@ export default function Footer() {
             setShopAllItems(
                 rows.map((cat: any) => ({
                     label: cat.name,
-                    link: `/all-products/${slugify(cat.name)}/${cat.id}`,
+                    link: `/all-products?categoryId=${cat.id}&categoryName=${encodeURIComponent(cat.name)}`,
                 }))
             );
         } catch (err) {

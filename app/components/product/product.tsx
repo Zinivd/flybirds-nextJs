@@ -47,7 +47,7 @@ export default function Products({ product }: { product: ProductItem }) {
                     </button>
                 </div>
             </div>
-            <Link href={`/product-details/${product.id}`}>
+            <Link href={`/product-details?id=${product.id}`}>
                 <div className="product-box-content">
                     <h4 className="mb-0">
                         <i className="fas fa-star text-warning"></i> {product.rating} ({product.review} Reviews)

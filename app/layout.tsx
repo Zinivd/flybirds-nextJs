@@ -11,7 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 export const metadata: Metadata = {
   title: "Flybirds Leggings",
-  icons: { icon: "/favicon.ico" },
+  icons: { icon: "/iconss.webp" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

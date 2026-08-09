@@ -1,7 +1,7 @@
-
-
+// app/(main)/all-products/page.tsx
 "use client";
-import { useEffect, useState, useCallback } from "react";
+import { Suspense, useEffect, useState, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Products from "@/app/components/product/product";
 import FilterSidebar from "@/app/(main)/all-products/filter-sidebar/filter-sidebar";
@@ -29,11 +29,17 @@ const sortOptions = [
 ];
 const sizes = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL"];
 
-export default function AllProductsIndex() {
+function AllProductsInner() {
+    const searchParams = useSearchParams();
+    const categoryIdParam = searchParams.get("categoryId");
+    const categoryId = categoryIdParam ? Number(categoryIdParam) : null;
+    const categoryNameParam = searchParams.get("categoryName");
+    const categoryName = categoryNameParam ? decodeURIComponent(categoryNameParam) : "";
+
     const [products, setProducts] = useState<any[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [colors, setColors] = useState<Color[]>([]);
-    const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+    const [selectedCategories, setSelectedCategories] = useState<number[]>(categoryId ? [categoryId] : []);
     const [selectedColors, setSelectedColors] = useState<number[]>([]);
     const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -61,7 +67,6 @@ export default function AllProductsIndex() {
             const szs = overrides.sizes ?? selectedSizes;
             const [minV, maxV] = overrides.priceValues ?? values;
             const sort = overrides.sort ?? sortBy;
-
             const queryParams: any = {
                 min_price: minV,
                 max_price: maxV,
@@ -70,7 +75,6 @@ export default function AllProductsIndex() {
             if (cats.length) queryParams.category_id = cats.join(",");
             if (cols.length) queryParams.color_id = cols.join(",");
             if (szs.length) queryParams.size = szs.join(",");
-
             switch (sort) {
                 case "1":
                     queryParams.sort = "price_asc";
@@ -81,7 +85,6 @@ export default function AllProductsIndex() {
                 default:
                     queryParams.sort = "";
             }
-
             setIsLoading(true);
             try {
                 const res = await getProducts<any>(queryParams);
@@ -136,9 +139,11 @@ export default function AllProductsIndex() {
         }
         loadCategories();
         loadColors();
-        loadProducts({ categories: [] });
+        const initialCats = categoryId ? [categoryId] : [];
+        setSelectedCategories(initialCats);
+        loadProducts({ categories: initialCats });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [categoryId]);
 
     function toggleSection(section: string) {
         setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
@@ -169,12 +174,13 @@ export default function AllProductsIndex() {
         loadProducts({ priceValues: next });
     }
     function resetFilters() {
-        setSelectedCategories([]);
+        const cats = categoryId ? [categoryId] : [];
+        setSelectedCategories(cats);
         setSelectedColors([]);
         setSelectedSizes([]);
         setValues([0, 5000]);
         setSortBy("0");
-        loadProducts({ categories: [], colors: [], sizes: [], priceValues: [0, 5000], sort: "0" });
+        loadProducts({ categories: cats, colors: [], sizes: [], priceValues: [0, 5000], sort: "0" });
     }
     function handleSortChange(value: string) {
         setSortBy(value);
@@ -219,9 +225,18 @@ export default function AllProductsIndex() {
                     <Link href="/">Home
                         <i className="fas fa-chevron-right ps-1"></i>
                     </Link>
-                    <a className="active">All Products</a>
+                    {categoryName ? (
+                        <>
+                            <Link href="/all-products">All Products
+                                <i className="fas fa-chevron-right ps-1"></i>
+                            </Link>
+                            <a className="active">{categoryName}</a>
+                        </>
+                    ) : (
+                        <a className="active">All Products</a>
+                    )}
                 </h6>
-                <h4>All Products</h4>
+                <h4>{categoryName || "All Products"}</h4>
                 <div className="form select-div mb-3">
                     <label htmlFor="sort" className="me-2">Sort By : </label>
                     <select
@@ -291,5 +306,19 @@ export default function AllProductsIndex() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function AllProducts() {
+    return (
+        <Suspense
+            fallback={
+                <div className="text-center py-5">
+                    <div className="spinner-border text-main"></div>
+                </div>
+            }
+        >
+            <AllProductsInner />
+        </Suspense>
     );
 }

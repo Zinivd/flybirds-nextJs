@@ -1,8 +1,7 @@
-// app/(main)/product-details/[id]/page.tsx
+// app/(main)/product-details/page.tsx
 "use client";
-
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import Products from "@/app/components/product/product";
@@ -18,7 +17,6 @@ import {
 } from "@/app/lib/api";
 import { htmlToPlainText, round2, formatDate } from "@/app/lib/format";
 import { ProductItem } from "@/app/types/shop.models";
-
 import "./page.css";
 import "./content.css";
 import "./description.css";
@@ -50,7 +48,6 @@ const highlights = [
     { icon: "bx bx-handshake", text: "Easy 7 days returns and exchanges" },
     { icon: "bx bx-currency-note", text: "Cash on Delivery" },
 ];
-
 const fabrics = [
     { text: "Machine Wash", img: "/assets/images/Icons/1.png" },
     { text: "Do Not Tumble Dry", img: "/assets/images/Icons/2.png" },
@@ -60,7 +57,6 @@ const fabrics = [
     { text: "Wash with like colors", img: "/assets/images/Icons/6.png" },
     { text: "Wash Inside Out", img: "/assets/images/Icons/7.png" },
 ];
-
 const SLIDES_PER_PAGE = 3;
 
 function getStars(count: number): number[] {
@@ -86,9 +82,9 @@ function mapProduct(row: any): ProductItem {
     };
 }
 
-export default function ProductDetails() {
-    const params = useParams<{ id: string }>();
-    const productId = Number(params.id);
+function ProductDetailsInner() {
+    const searchParams = useSearchParams();
+    const productId = Number(searchParams.get("id"));
 
     const [loading, setLoading] = useState(true);
     const [category, setCategory] = useState("");
@@ -110,7 +106,6 @@ export default function ProductDetails() {
     const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
     const [selectedSizeStockId, setSelectedSizeStockId] = useState<number | null>(null);
     const [selectedSize, setSelectedSize] = useState("");
-
     // Reviews
     const [reviews, setReviews] = useState<ProductReview[]>([]);
     const [isReviewsLoading, setIsReviewsLoading] = useState(true);
@@ -119,12 +114,10 @@ export default function ProductDetails() {
     const [submittingReview, setSubmittingReview] = useState(false);
     const [reviewForm, setReviewForm] = useState({ title: "", description: "", rating: 0 });
     const [hoverStar, setHoverStar] = useState(0);
-
     // Similar products
     const [products, setProducts] = useState<ProductItem[]>([]);
     const [isSimilarLoading, setIsSimilarLoading] = useState(true);
     const [isWishlisted, setIsWishlisted] = useState(false);
-
     const [wishlistBusy, setWishlistBusy] = useState(false);
     const [addingToCart, setAddingToCart] = useState(false);
 
@@ -145,21 +138,17 @@ export default function ProductDetails() {
         try {
             const res = await getProductById<any>(productId);
             const product = res.data;
-
             setCategory(product.category?.name || "");
             setProductName(product.name);
             setProductDescription(htmlToPlainText(product.description || ""));
             setSubtitle(product.brand);
-
             const p = round2(Number(product.effective_price));
             const op = round2(Number(product.unit_price));
             setPrice(p);
             setOriginalPrice(op);
             setDiscountPercent(Number(product.discount) || 0);
             setSavedAmount(round2(op - p));
-
             setEstimatedDelivery(product.estimate_shipping_days + " Days");
-
             const variants: ColorVariant[] = product.color_variants || [];
             setColorVariants(variants);
             setColors(
@@ -170,7 +159,6 @@ export default function ProductDetails() {
                     border: ["#fff", "#ffffff", "#fffff"].includes(v.color.code.toLowerCase()),
                 }))
             );
-
             let images: string[] = [];
             const firstVariant = variants[0];
             if (firstVariant) {
@@ -181,7 +169,6 @@ export default function ProductDetails() {
             }
             if (!images.length) images = ["/assets/images/no-image.png"];
             setProductImages(images);
-
             setSpecifications([
                 { label: "Brand", value: product.brand },
                 { label: "Category", value: product.category?.name },
@@ -192,7 +179,6 @@ export default function ProductDetails() {
                 { label: "Tags", value: product.tags },
                 { label: "Shipping Days", value: product.estimate_shipping_days + " Days" },
             ]);
-
             setIsWishlisted(!!product.is_wishlisted);
             setLoading(false);
             trackRecentlyViewed();
@@ -250,15 +236,12 @@ export default function ProductDetails() {
         setReviewForm({ title: "", description: "", rating: 0 });
         setShowReviewModal(true);
     }
-
     function closeReviewModal() {
         setShowReviewModal(false);
     }
-
     function setReviewRating(star: number) {
         setReviewForm((f) => ({ ...f, rating: star }));
     }
-
     async function submitReview() {
         const uid = userId();
         if (!uid) return;
@@ -275,7 +258,6 @@ export default function ProductDetails() {
             return;
         }
         if (submittingReview) return;
-
         setSubmittingReview(true);
         try {
             await createReview<any>({
@@ -296,11 +278,9 @@ export default function ProductDetails() {
     }
 
     const visibleReviews = reviews.slice(currentSlide, currentSlide + SLIDES_PER_PAGE);
-
     function prevSlide() {
         if (currentSlide > 0) setCurrentSlide((s) => s - 1);
     }
-
     function nextSlide() {
         if (currentSlide + SLIDES_PER_PAGE < reviews.length) setCurrentSlide((s) => s + 1);
     }
@@ -310,7 +290,6 @@ export default function ProductDetails() {
         const variant = colorVariants.find((v) => v.id === colorId);
         if (variant) selectVariant(variant);
     }
-
     function selectVariant(variant: ColorVariant) {
         setSelectedVariantId(variant.id);
         const images = (variant.gallery_images || [])
@@ -322,7 +301,6 @@ export default function ProductDetails() {
         setSelectedSize("");
         setSelectedSizeStockId(null);
     }
-
     function selectSize(size: string) {
         setSelectedSize(size);
         const variant = colorVariants.find((v) => v.id === selectedVariantId);
@@ -339,7 +317,6 @@ export default function ProductDetails() {
         }
         if (wishlistBusy) return;
         setWishlistBusy(true);
-
         try {
             if (isWishlisted) {
                 await removeFromWishlist(uid, productId);
@@ -356,7 +333,6 @@ export default function ProductDetails() {
             setWishlistBusy(false);
         }
     }
-
     async function addToBag() {
         const uid = userId();
         if (!uid) {
@@ -372,7 +348,6 @@ export default function ProductDetails() {
             return;
         }
         if (addingToCart) return;
-
         setAddingToCart(true);
         try {
             await addToCart(uid, {
@@ -388,20 +363,18 @@ export default function ProductDetails() {
             setAddingToCart(false);
         }
     }
-
     function buyNow() {
         addToBag();
     }
-
     async function trackRecentlyViewed() {
-        const uid = userId();
-        if (!uid) return;
-        try {
-            await addRecentlyViewed({ user_id: uid, product_id: productId });
-        } catch (err) {
-            console.error("Failed to record recently viewed:", err);
-        }
+    const uid = userId();
+    if (!uid) return;
+    try {
+        await addRecentlyViewed({ user_id: uid, product_id: productId });
+    } catch (err: any) {
+        console.error("Failed to record recently viewed:", err?.response?.data || err);
     }
+}
 
     if (loading) {
         return (
@@ -423,7 +396,6 @@ export default function ProductDetails() {
                     <a className="active">{category}</a>
                 </h6>
             </div>
-
             {/* Product Content */}
             <div className="product-details-main">
                 <div className="product-content">
@@ -434,7 +406,6 @@ export default function ProductDetails() {
                             </div>
                         ))}
                     </div>
-
                     <div className="product-content-right">
                         <h4 className="mb-1 text-main">{category}</h4>
                         <div className="d-flex align-items-center justify-content-between flex-wrap">
@@ -455,7 +426,6 @@ export default function ProductDetails() {
                         <h6 className="mb-3">
                             <i className="fas fa-star text-warning"></i> {rating.toFixed(1)} ({reviewCount} Reviews)
                         </h6>
-
                         <div className="d-flex align-items-center column-gap-2 flex-wrap">
                             <h3 className="mb-2">
                                 &#8377; {price}
@@ -471,7 +441,6 @@ export default function ProductDetails() {
                         </div>
                         <h6 className="mb-2">(Inclusive of all taxes)</h6>
                         <hr />
-
                         {/* Colors */}
                         <div className="d-flex justify-content-between align-items-center flex-wrap">
                             <h5 className="mb-3">Select Color</h5>
@@ -495,7 +464,6 @@ export default function ProductDetails() {
                             ))}
                         </div>
                         <hr />
-
                         {/* Sizes */}
                         <div className="d-flex justify-content-between align-items-center flex-wrap">
                             <h5 className="mb-2">Select Size</h5>
@@ -512,26 +480,13 @@ export default function ProductDetails() {
                             ))}
                         </div>
                         <hr />
-
-                        {/* Check Delivery */}
-                        {/* <h5 className="mb-3">Check Delivery</h5>
-                        <div className="d-flex align-items-center justify-content-between gap-2 mb-4">
-                            <input type="text" name="delivery" id="delivery" className="form-control w-75" placeholder="Enter Pincode" />
-                            <button type="button" className="form-btn w-25">Check</button>
-                        </div>
-                        <h6 className="mb-4">
-                            <i className="fas fa-truck-fast me-2"></i> Estimated delivery in {estimatedDelivery}
-                        </h6> */}
-
                         {/* Buttons */}
                         <div className="d-flex align-items-center column-gap-1">
-                            {/* <button className="buy-btn w-50" onClick={buyNow}>Buy Now</button> */}
                             <button className="cart-btn w-100" onClick={addToBag}>
                                 <i className="bx bx-shopping-bag"></i> Add to Bag
                             </button>
                         </div>
                         <hr />
-
                         {/* Highlights */}
                         {highlights.map((item, i) => (
                             <div className="d-flex align-items-center column-gap-3 mb-3" key={i}>
@@ -548,9 +503,7 @@ export default function ProductDetails() {
                     </div>
                 </div>
             </div>
-
             <hr />
-
             {/* PRODUCT DESCRIPTION */}
             <div className="product-description-main">
                 <div className="product-description-left">
@@ -558,12 +511,10 @@ export default function ProductDetails() {
                         <h4 className="mb-0">Detail Spotlight</h4>
                     </div>
                 </div>
-
                 <div className="product-description-right form">
                     <h5 className="mb-2 text-main">Product Description</h5>
                     <h6 className="mb-0 description-text" style={{ whiteSpace: "pre-line" }}>{productDescription}</h6>
                     <hr />
-
                     <h5 className="mb-2 text-main">Specifications</h5>
                     <div className="row">
                         {specifications.map((spec, i) => (
@@ -574,7 +525,6 @@ export default function ProductDetails() {
                         ))}
                     </div>
                     <hr />
-
                     <h5 className="mb-2 text-main">Fabric &amp; Care</h5>
                     <div className="fabric-grid">
                         {fabrics.map((item, i) => (
@@ -588,7 +538,6 @@ export default function ProductDetails() {
                     </div>
                 </div>
             </div>
-
             {/* REVIEWS */}
             <div className="product-review-main">
                 <div className="product-review-div">
@@ -614,7 +563,6 @@ export default function ProductDetails() {
                                 <button className="form-btn" onClick={openReviewModal}>Write a Review</button>
                             </div>
                         </div>
-
                         {!isReviewsLoading && reviews.length > 0 && (
                             <div className="review-slider">
                                 <button className="slider-arrow left" onClick={prevSlide} disabled={currentSlide === 0}>
@@ -647,7 +595,6 @@ export default function ProductDetails() {
                                 </button>
                             </div>
                         )}
-
                         {!isReviewsLoading && reviews.length === 0 && (
                             <div className="text-center text-muted py-4">
                                 <i className="fas fa-star fa-2x mb-3"></i>
@@ -657,7 +604,6 @@ export default function ProductDetails() {
                     </div>
                 </div>
             </div>
-
             {/* Write a Review Modal */}
             {showReviewModal && (
                 <div className="custom-modal-overlay" onClick={closeReviewModal}>
@@ -715,7 +661,6 @@ export default function ProductDetails() {
                     </div>
                 </div>
             )}
-
             {/* SIMILAR PRODUCTS */}
             <div className="product-main mt-4">
                 {isSimilarLoading && (
@@ -738,5 +683,20 @@ export default function ProductDetails() {
                 )}
             </div>
         </div>
+    );
+}
+
+export default function ProductDetails() {
+    return (
+        <Suspense
+            fallback={
+                <div className="text-center py-5">
+                    <div className="spinner-border text-main"></div>
+                    <h6 className="mt-3">Loading product...</h6>
+                </div>
+            }
+        >
+            <ProductDetailsInner />
+        </Suspense>
     );
 }
