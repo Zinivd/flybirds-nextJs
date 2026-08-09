@@ -268,29 +268,30 @@ export default function Cart() {
     }
 
     function proceedToCheckout() {
-        if (cartItems.length === 0) return;
-        setOrderSummary({
-            items: cartItems.map((i) => ({
-                name: i.name,
-                qty: i.quantity,
-                price: i.price,
-                mrp: i.mrp,
-                discountType: i.discountType,
-                discountValue: i.discountValue,
-                image: i.image,
-                size: i.size,
-                productId: i.productId,
-                productColorVariantId: i.productColorVariantId,
-                productSizeStockId: i.productSizeStockId,
-            })),
-            subtotal,
-            discountAmount,
-            taxAmount,
-            total,
-            couponCode: appliedCoupon || undefined,
-        });
-        router.push("/checkout");
-    }
+    if (cartItems.length === 0) return;
+    setOrderSummary({
+        items: cartItems.map((i) => ({
+            name: i.name,
+            qty: i.quantity,
+            price: i.price,
+            mrp: i.mrp,
+            discountType: i.discountType,
+            discountValue: i.discountValue,
+            image: i.image,
+            size: i.size,
+            productId: i.productId,
+            productColorVariantId: i.productColorVariantId,
+            productSizeStockId: i.productSizeStockId,
+        })),
+        subtotal,
+        discountAmount,
+        shippingCharge: 0,
+        taxAmount,
+        total,
+        couponCode: appliedCoupon || undefined,
+    });
+    router.push("/checkout");
+}
 
     if (loading) {
         return (

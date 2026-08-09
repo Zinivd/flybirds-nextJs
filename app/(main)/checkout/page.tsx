@@ -138,13 +138,14 @@ export default function CheckoutAddressPage() {
     const [pincodeChecking, setPincodeChecking] = useState(false);
     const [customerEmail, setCustomerEmail] = useState("");
     const [customerName, setCustomerName] = useState("");
-    const [orderSummary, setOrderSummary] = useState<CheckoutOrderSummary>({
-        items: [],
-        subtotal: 0,
-        discountAmount: 0,
-        taxAmount: 0,
-        total: 0,
-    });
+   const [orderSummary, setOrderSummary] = useState<CheckoutOrderSummary>({
+    items: [],
+    subtotal: 0,
+    discountAmount: 0,
+    shippingCharge: 0,
+    taxAmount: 0,
+    total: 0,
+})
 
     // ---------- Delivery availability check for the SELECTED address ----------
     const [deliveryStatus, setDeliveryStatus] = useState<
