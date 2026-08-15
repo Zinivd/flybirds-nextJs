@@ -5,8 +5,9 @@ import { CollectionItem } from "@/app/types/shop.models";
 import "./collection.css"
 
 export default function Collection({ collection }: { collection: CollectionItem }) {
-    const href = `/all-products/${collection.slug}/${collection.id}`;
-
+    const href = `/all-products?categoryName=${encodeURIComponent(collection.name)}&categoryId=${collection.id}`;
+    // const href = `/all-products/${collection.slug}/${collection.id}`;
+// /all-products?categoryName=${encodeURIComponent(collection.name)}&categoryId=${category.id}
     return (
         <div className="collection-box">
             <div className="collection-img">

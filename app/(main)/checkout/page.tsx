@@ -412,7 +412,7 @@ export default function CheckoutAddressPage() {
                 }
                 router.push(`/payment?orderId=${orderId}`);
             })
-            .catch(() => toast.error("Failed to create order. Please try again."))
+            .catch(() => toast.error("Update Email in the profile page to proceed with payment."))
             .finally(() => setCreatingOrder(false));
     }
     if (loadingAddresses) {
