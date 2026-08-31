@@ -28,12 +28,31 @@ interface SizeStock {
     stock: number;
     price: number;
 }
+
+interface FamilyColor {
+    id: number;
+    name: string;
+    code: string;
+}
+
+interface FamilyColorChild {
+    id: number;
+    family_color_id: number;
+    name: string;
+    code: string;
+}
+
 interface ColorVariant {
     id: number;
-    color: { id: number; name: string; code: string };
+    product_id: number;
+    family_color_id: number;
+    family_color_child_id: number;
+    family_color: FamilyColor;
+    family_color_child: FamilyColorChild;
     gallery_images: { image_url: string; sort_order: number }[];
     size_stocks: SizeStock[];
 }
+
 interface ProductReview {
     id: number;
     title: string;
@@ -48,6 +67,7 @@ const highlights = [
     { icon: "bx bx-handshake", text: "Easy 7 days returns and exchanges" },
     { icon: "bx bx-currency-note", text: "Cash on Delivery" },
 ];
+
 const fabrics = [
     { text: "Machine Wash", img: "/assets/images/Icons/1.png" },
     { text: "Do Not Tumble Dry", img: "/assets/images/Icons/2.png" },
@@ -57,28 +77,57 @@ const fabrics = [
     { text: "Wash with like colors", img: "/assets/images/Icons/6.png" },
     { text: "Wash Inside Out", img: "/assets/images/Icons/7.png" },
 ];
+
 const SLIDES_PER_PAGE = 3;
 
 function getStars(count: number): number[] {
     return Array(Math.round(count)).fill(0);
 }
 
+function isWhiteCode(code: string) {
+    return ["#fff", "#ffffff", "#fffff"].includes((code || "").toLowerCase());
+}
+
 function mapProduct(row: any): ProductItem {
     const firstVariant = row.color_variants?.[0];
-    const sortedImages = firstVariant?.gallery_images?.slice().sort((a: any, b: any) => a.sort_order - b.sort_order);
-    const discount = Number(row.discount) || 0;
+    const sortedImages = firstVariant?.gallery_images
+        ?.slice()
+        .sort((a: any, b: any) => a.sort_order - b.sort_order);
+
     return {
         id: row.id,
-        title: row.name,
-        subtitle: row.brand,
-        image: sortedImages?.[0]?.image_url ?? "/assets/images/no-image.png",
-        rating: 5,
-        review: 0,
-        sp: row.effective_price,
-        mrp: Number(row.unit_price),
-        badge: row.is_flash_sale ? row.flash_sale_title || "Sale" : discount > 0 ? `${discount}% OFF` : "",
-        color_variants: row.color_variants || [],
+        name: row.name,
+        brand: row.brand,
+        unit: row.unit,
+        weight: row.weight,
+        min_qty: row.min_qty,
+        tags: row.tags,
+        description: row.description,
+        spotlight_image: sortedImages?.[0]?.image_url ?? row.spotlight_image ?? "/assets/images/no-image.png",
+        seo_title: row.seo_title,
+        seo_description: row.seo_description,
+        seo_keywords: row.seo_keywords,
         category_id: row.category_id,
+        category: row.category,
+        unit_price: row.unit_price,
+        discount: row.discount,
+        discount_type: row.discount_type,
+        discount_start_date: row.discount_start_date,
+        discount_end_date: row.discount_end_date,
+        effective_price: Number(row.effective_price),
+        reward_points: row.reward_points,
+        is_flash_sale: !!row.is_flash_sale,
+        flash_sale_title: row.flash_sale_title,
+        flash_sale_discount: row.flash_sale_discount,
+        flash_sale_discount_type: row.flash_sale_discount_type,
+        is_today_sale: !!row.is_today_sale,
+        is_published: !!row.is_published,
+        is_active: !!row.is_active,
+        total_sold: row.total_sold,
+        is_wishlisted: !!row.is_wishlisted,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+        color_variants: row.color_variants || [],
     };
 }
 
@@ -100,12 +149,25 @@ function ProductDetailsInner() {
     const [estimatedDelivery, setEstimatedDelivery] = useState("");
     const [productImages, setProductImages] = useState<string[]>([]);
     const [specifications, setSpecifications] = useState<{ label: string; value: any }[]>([]);
+
+    // Detail Spotlight image
+    const [spotlightImage, setSpotlightImage] = useState("");
+
+    // SEO
+    const [seoTitle, setSeoTitle] = useState("");
+    const [seoDescription, setSeoDescription] = useState("");
+    const [seoKeywords, setSeoKeywords] = useState("");
+
+    // Color / shade / size
     const [colorVariants, setColorVariants] = useState<ColorVariant[]>([]);
-    const [colors, setColors] = useState<{ id: number; name: string; code: string; border?: boolean }[]>([]);
-    const [availableSizes, setAvailableSizes] = useState<string[]>([]);
+    const [familyColors, setFamilyColors] = useState<FamilyColor[]>([]);
+    const [selectedFamilyColorId, setSelectedFamilyColorId] = useState<number | null>(null);
+    const [shades, setShades] = useState<{ variantId: number; id: number; name: string; code: string }[]>([]);
     const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
+    const [availableSizes, setAvailableSizes] = useState<string[]>([]);
     const [selectedSizeStockId, setSelectedSizeStockId] = useState<number | null>(null);
     const [selectedSize, setSelectedSize] = useState("");
+
     // Reviews
     const [reviews, setReviews] = useState<ProductReview[]>([]);
     const [isReviewsLoading, setIsReviewsLoading] = useState(true);
@@ -114,6 +176,7 @@ function ProductDetailsInner() {
     const [submittingReview, setSubmittingReview] = useState(false);
     const [reviewForm, setReviewForm] = useState({ title: "", description: "", rating: 0 });
     const [hoverStar, setHoverStar] = useState(0);
+
     // Similar products
     const [products, setProducts] = useState<ProductItem[]>([]);
     const [isSimilarLoading, setIsSimilarLoading] = useState(true);
@@ -133,15 +196,45 @@ function ProductDetailsInner() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [productId]);
 
+    // ---------- SEO meta tags (client-rendered, since data loads after mount) ----------
+    useEffect(() => {
+        if (loading) return;
+        document.title = seoTitle || productName || "Flybirds";
+        setMetaTag("description", seoDescription || productDescription);
+        setMetaTag("keywords", seoKeywords);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [loading, seoTitle, seoDescription, seoKeywords, productName, productDescription]);
+
+    function setMetaTag(name: string, content: string) {
+        if (!content) return;
+        let tag = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement | null;
+        if (!tag) {
+            tag = document.createElement("meta");
+            tag.setAttribute("name", name);
+            document.head.appendChild(tag);
+        }
+        tag.setAttribute("content", content);
+    }
+
     async function getProduct() {
         setLoading(true);
         try {
             const res = await getProductById<any>(productId);
             const product = res.data;
+
             setCategory(product.category?.name || "");
             setProductName(product.name);
             setProductDescription(htmlToPlainText(product.description || ""));
             setSubtitle(product.brand);
+            setSpotlightImage(product.spotlight_image || "");
+
+            // SEO
+            setSeoTitle(product.seo_title || product.name || "");
+            setSeoDescription(product.seo_description || "");
+            setSeoKeywords(
+                Array.isArray(product.seo_keywords) ? product.seo_keywords.join(", ") : product.seo_keywords || ""
+            );
+
             const p = round2(Number(product.effective_price));
             const op = round2(Number(product.unit_price));
             setPrice(p);
@@ -149,26 +242,27 @@ function ProductDetailsInner() {
             setDiscountPercent(Number(product.discount) || 0);
             setSavedAmount(round2(op - p));
             setEstimatedDelivery(product.estimate_shipping_days + " Days");
+
             const variants: ColorVariant[] = product.color_variants || [];
             setColorVariants(variants);
-            setColors(
-                variants.map((v: any) => ({
-                    id: v.id,
-                    name: v.color.name,
-                    code: v.color.code,
-                    border: ["#fff", "#ffffff", "#fffff"].includes(v.color.code.toLowerCase()),
-                }))
-            );
-            let images: string[] = [];
-            const firstVariant = variants[0];
-            if (firstVariant) {
-                setSelectedVariantId(firstVariant.id);
-                const sortedImages = (firstVariant.gallery_images || []).slice().sort((a, b) => a.sort_order - b.sort_order);
-                images = sortedImages.map((img) => img.image_url);
-                setAvailableSizes((firstVariant.size_stocks || []).map((s) => s.size));
+
+            // Build unique family colors (dedupe by family_color.id, preserve order)
+            const familyMap = new Map<number, FamilyColor>();
+            variants.forEach((v) => {
+                if (v.family_color && !familyMap.has(v.family_color.id)) {
+                    familyMap.set(v.family_color.id, v.family_color);
+                }
+            });
+            const familyList = Array.from(familyMap.values());
+            setFamilyColors(familyList);
+
+            if (variants.length) {
+                const firstVariant = variants[0];
+                applyFamilyColor(firstVariant.family_color_id, variants, firstVariant.id);
+            } else {
+                setProductImages(["/assets/images/no-image.png"]);
             }
-            if (!images.length) images = ["/assets/images/no-image.png"];
-            setProductImages(images);
+
             setSpecifications([
                 { label: "Brand", value: product.brand },
                 { label: "Category", value: product.category?.name },
@@ -179,6 +273,7 @@ function ProductDetailsInner() {
                 { label: "Tags", value: product.tags },
                 { label: "Shipping Days", value: product.estimate_shipping_days + " Days" },
             ]);
+
             setIsWishlisted(!!product.is_wishlisted);
             setLoading(false);
             trackRecentlyViewed();
@@ -285,12 +380,35 @@ function ProductDetailsInner() {
         if (currentSlide + SLIDES_PER_PAGE < reviews.length) setCurrentSlide((s) => s + 1);
     }
 
-    // ---------- Colors / sizes ----------
-    function selectColor(colorId: number) {
-        const variant = colorVariants.find((v) => v.id === colorId);
-        if (variant) selectVariant(variant);
+    // ---------- Family Color / Shade / Size ----------
+
+    function applyFamilyColor(familyColorId: number, variants: ColorVariant[], preferredVariantId?: number) {
+        setSelectedFamilyColorId(familyColorId);
+        const familyVariants = variants.filter((v) => v.family_color_id === familyColorId);
+        const shadeList = familyVariants.map((v) => ({
+            variantId: v.id,
+            id: v.family_color_child.id,
+            name: v.family_color_child.name,
+            code: v.family_color_child.code,
+        }));
+        setShades(shadeList);
+
+        const variantToSelect =
+            familyVariants.find((v) => v.id === preferredVariantId) || familyVariants[0];
+        if (variantToSelect) applyVariant(variantToSelect);
     }
-    function selectVariant(variant: ColorVariant) {
+
+    function selectFamilyColor(familyColorId: number) {
+        if (familyColorId === selectedFamilyColorId) return;
+        applyFamilyColor(familyColorId, colorVariants);
+    }
+
+    function selectShade(variantId: number) {
+        const variant = colorVariants.find((v) => v.id === variantId);
+        if (variant) applyVariant(variant);
+    }
+
+    function applyVariant(variant: ColorVariant) {
         setSelectedVariantId(variant.id);
         const images = (variant.gallery_images || [])
             .slice()
@@ -301,6 +419,7 @@ function ProductDetailsInner() {
         setSelectedSize("");
         setSelectedSizeStockId(null);
     }
+
     function selectSize(size: string) {
         setSelectedSize(size);
         const variant = colorVariants.find((v) => v.id === selectedVariantId);
@@ -333,48 +452,60 @@ function ProductDetailsInner() {
             setWishlistBusy(false);
         }
     }
+
     async function addToBag() {
-        const uid = userId();
-        if (!uid) {
-            toast.info("Please log in to add items to your bag.");
-            return;
-        }
-        if (!selectedVariantId) {
-            toast.info("Please select a color.");
-            return;
-        }
-        if (!selectedSizeStockId) {
-            toast.info("Please select a size.");
-            return;
-        }
-        if (addingToCart) return;
-        setAddingToCart(true);
-        try {
-            await addToCart(uid, {
-                product_id: productId,
-                product_color_variant_id: selectedVariantId,
-                product_size_stock_id: selectedSizeStockId,
-                quantity: 1,
-            });
-            toast.success("Added to bag!");
-        } catch {
-            toast.error("Failed to add to bag.");
-        } finally {
-            setAddingToCart(false);
-        }
+    const uid = userId();
+    if (!uid) {
+        toast.info("Please log in to add items to your bag.");
+        return;
     }
+    if (!selectedVariantId) {
+        toast.info("Please select a color.");
+        return;
+    }
+    if (!selectedSizeStockId) {
+        toast.info("Please select a size.");
+        return;
+    }
+    if (addingToCart) return;
+
+    const variant = colorVariants.find((v) => v.id === selectedVariantId);
+    if (!variant) {
+        toast.error("Selected color variant not found.");
+        return;
+    }
+
+    setAddingToCart(true);
+    try {
+        await addToCart(uid, {
+            product_id: productId,
+            product_color_variant_id: selectedVariantId,
+            family_color_id: variant.family_color_id,
+            family_color_child_id: variant.family_color_child_id ?? null,
+            product_size_stock_id: selectedSizeStockId,
+            quantity: 1,
+        });
+        toast.success("Added to bag!");
+    } catch {
+        toast.error("Failed to add to bag.");
+    } finally {
+        setAddingToCart(false);
+    }
+}
+
     function buyNow() {
         addToBag();
     }
+
     async function trackRecentlyViewed() {
-    const uid = userId();
-    if (!uid) return;
-    try {
-        await addRecentlyViewed({ user_id: uid, product_id: productId });
-    } catch (err: any) {
-        console.error("Failed to record recently viewed:", err?.response?.data || err);
+        const uid = userId();
+        if (!uid) return;
+        try {
+            await addRecentlyViewed({ user_id: uid, product_id: productId });
+        } catch (err: any) {
+            console.error("Failed to record recently viewed:", err?.response?.data || err);
+        }
     }
-}
 
     if (loading) {
         return (
@@ -396,6 +527,7 @@ function ProductDetailsInner() {
                     <a className="active">{category}</a>
                 </h6>
             </div>
+
             {/* Product Content */}
             <div className="product-details-main">
                 <div className="product-content">
@@ -441,29 +573,58 @@ function ProductDetailsInner() {
                         </div>
                         <h6 className="mb-2">(Inclusive of all taxes)</h6>
                         <hr />
-                        {/* Colors */}
+
+                        {/* Select Family Color */}
                         <div className="d-flex justify-content-between align-items-center flex-wrap">
-                            <h5 className="mb-3">Select Color</h5>
+                            <h5 className="mb-3">Select Family Color</h5>
                         </div>
                         <div className="colors-div mb-3">
-                            {colors.map((item) => (
+                            {familyColors.map((item) => (
                                 <div
-                                    className={`color-swatch ${selectedVariantId && item.id === selectedVariantId ? "active" : ""}`}
+                                    className={`color-swatch ${item.id === selectedFamilyColorId ? "active" : ""}`}
                                     key={item.id}
-                                    onClick={() => selectColor(item.id)}
+                                    onClick={() => selectFamilyColor(item.id)}
                                 >
                                     <span
                                         className="color-box"
                                         style={{
                                             backgroundColor: item.code,
-                                            border: item.border ? "1px solid var(--border)" : "none",
+                                            border: isWhiteCode(item.code) ? "1px solid var(--border)" : "none",
                                         }}
                                     ></span>
                                     <small className="mt-2">{item.name}</small>
                                 </div>
                             ))}
                         </div>
+
+                        {/* Select Shade */}
+                        {shades.length > 0 && (
+                            <>
+                                <div className="d-flex justify-content-between align-items-center flex-wrap">
+                                    <h5 className="mb-3">Select Shade</h5>
+                                </div>
+                                <div className="shades-div mb-3">
+                                    {shades.map((item) => (
+                                        <div
+                                            className={`shade-swatch ${item.variantId === selectedVariantId ? "active" : ""}`}
+                                            key={item.variantId}
+                                            onClick={() => selectShade(item.variantId)}
+                                        >
+                                            <span
+                                                className="shade-box"
+                                                style={{
+                                                    backgroundColor: item.code,
+                                                    border: isWhiteCode(item.code) ? "1px solid var(--border)" : "none",
+                                                }}
+                                            ></span>
+                                            <small className="mt-2">{item.name}</small>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
+                        )}
                         <hr />
+
                         {/* Sizes */}
                         <div className="d-flex justify-content-between align-items-center flex-wrap">
                             <h5 className="mb-2">Select Size</h5>
@@ -480,13 +641,18 @@ function ProductDetailsInner() {
                             ))}
                         </div>
                         <hr />
+
                         {/* Buttons */}
                         <div className="d-flex align-items-center column-gap-1">
-                            <button className="cart-btn w-100" onClick={addToBag}>
-                                <i className="bx bx-shopping-bag"></i> Add to Bag
+                            <button className="cart-btn w-100" onClick={buyNow}>
+                                Buy Now
+                            </button>
+                            <button className="cart-btn w-100 active" onClick={addToBag} disabled={addingToCart}>
+                                <i className="bx bx-shopping-bag"></i> {addingToCart ? "Adding..." : "Add to Bag"}
                             </button>
                         </div>
                         <hr />
+
                         {/* Highlights */}
                         {highlights.map((item, i) => (
                             <div className="d-flex align-items-center column-gap-3 mb-3" key={i}>
@@ -503,17 +669,25 @@ function ProductDetailsInner() {
                     </div>
                 </div>
             </div>
+
             <hr />
+
             {/* PRODUCT DESCRIPTION */}
             <div className="product-description-main">
                 <div className="product-description-left">
-                    <div className="body-head mb-0">
-                        <h4 className="mb-0">Detail Spotlight</h4>
-                    </div>
+                    {spotlightImage ? (
+                        <img src={spotlightImage} alt="Detail Spotlight" className="spotlight-img" />
+                    ) : (
+                        <div className="body-head mb-0">
+                            <h4 className="mb-0">Detail Spotlight</h4>
+                        </div>
+                    )}
                 </div>
                 <div className="product-description-right form">
                     <h5 className="mb-2 text-main">Product Description</h5>
-                    <h6 className="mb-0 description-text" style={{ whiteSpace: "pre-line" }}>{productDescription}</h6>
+                    <h6 className="mb-0 description-text" style={{ whiteSpace: "pre-line" }}>
+                        {productDescription}
+                    </h6>
                     <hr />
                     <h5 className="mb-2 text-main">Specifications</h5>
                     <div className="row">
@@ -538,6 +712,7 @@ function ProductDetailsInner() {
                     </div>
                 </div>
             </div>
+
             {/* REVIEWS */}
             <div className="product-review-main">
                 <div className="product-review-div">
@@ -560,7 +735,9 @@ function ProductDetailsInner() {
                             </div>
                             <div className="review-header-border"></div>
                             <div className="review-header-right">
-                                <button className="form-btn" onClick={openReviewModal}>Write a Review</button>
+                                <button className="form-btn" onClick={openReviewModal}>
+                                    Write a Review
+                                </button>
                             </div>
                         </div>
                         {!isReviewsLoading && reviews.length > 0 && (
@@ -604,6 +781,7 @@ function ProductDetailsInner() {
                     </div>
                 </div>
             </div>
+
             {/* Write a Review Modal */}
             {showReviewModal && (
                 <div className="custom-modal-overlay" onClick={closeReviewModal}>
@@ -615,7 +793,9 @@ function ProductDetailsInner() {
                             </button>
                         </div>
                         <div className="mb-3">
-                            <label className="mb-2">Your Rating <span>*</span></label>
+                            <label className="mb-2">
+                                Your Rating <span>*</span>
+                            </label>
                             <div className="d-flex column-gap-2">
                                 {[1, 2, 3, 4, 5].map((s) => (
                                     <i
@@ -634,7 +814,9 @@ function ProductDetailsInner() {
                             </div>
                         </div>
                         <div className="mb-3">
-                            <label htmlFor="review-title">Title <span>*</span></label>
+                            <label htmlFor="review-title">
+                                Title <span>*</span>
+                            </label>
                             <input
                                 type="text"
                                 className="form-control"
@@ -645,7 +827,9 @@ function ProductDetailsInner() {
                             />
                         </div>
                         <div className="mb-3">
-                            <label htmlFor="review-description">Description <span>*</span></label>
+                            <label htmlFor="review-description">
+                                Description <span>*</span>
+                            </label>
                             <textarea
                                 className="form-control"
                                 id="review-description"
@@ -661,6 +845,7 @@ function ProductDetailsInner() {
                     </div>
                 </div>
             )}
+
             {/* SIMILAR PRODUCTS */}
             <div className="product-main mt-4">
                 {isSimilarLoading && (

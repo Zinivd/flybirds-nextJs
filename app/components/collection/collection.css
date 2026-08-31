@@ -22,8 +22,8 @@
 
 .collection-img {
     position: relative;
-    width: 100%;
-    height: 300px;
+    width: 292px;
+    height: 426px;
     border: 2px solid var(--border);
     border-radius: 8px;
     display: flex;
@@ -34,8 +34,8 @@
 
 .collection-box img {
     width: 100%;
-    height: 90%;
-    object-fit: contain;
+    height: 100%;
+    object-fit: cover;
     border-radius: 8px;
     transition: all var(--transition);
 }
@@ -56,6 +56,7 @@
     align-items: center;
     gap: 8px;
     margin-top: 10px;
+    width: 292px;
 }
 
 /* Pill label button (e.g. "Ankle", "Shimmer") */
@@ -84,7 +85,7 @@
     }
 
     .collection-img {
-        height: 350px;
+        height: 426px;
     }
 }
 

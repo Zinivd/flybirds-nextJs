@@ -1,54 +1,34 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getCategoryList } from "@/app/lib/api";
+import "./footer.css";
 
-import "./footer.css"
-
-interface ShopAllItem {
+interface CategoryItem {
     label: string;
     link: string;
 }
 
-function slugify(name: string) {
-    return (name || "")
-        .toLowerCase()
-        .trim()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
-}
-
 const quickLinks = [
-    { label: "Our Story", link: "" },
-    { label: "FAQ's", link: "" },
-    { label: "Blogs", link: "" },
-    { label: "Testimonials", link: "" },
-    { label: "Contact Us", link: "" },
+    { label: "Our Story", link: "/about-us" },
+    { label: "FAQ's", link: "/faq-answers" },
+    { label: "Contact Us", link: "/contact-us" },
 ];
 
 const helpLinks = [
-    { label: "Track Your Order", link: "" },
-    { label: "Customer Support", link: "" },
-    { label: "Profile", link: "" },
-    { label: "Returns & Exchange", link: "" },
-    { label: "Size Guide", link: "" },
-];
-
-const shopLinks = [
-    { label: "Shimmer Leggings", link: "" },
-    { label: "Saree Shapper", link: "" },
-    { label: "Yoga Shorts", link: "" },
-    { label: "Kurti Pants", link: "" },
-    { label: "Chudithar Leggings", link: "" },
-    { label: "Ankle Leggings", link: "" },
+    { label: "Track Your Order", link: "/profile" },
+    { label: "Customer Support", link: "/contact-us" },
+    { label: "Profile", link: "/profile" },
+    { label: "Returns & Exchange", link: "/profile" },
+    { label: "Size Guide", link: "/size-guide" },
 ];
 
 const policyLinks = [
-    { label: "Terms & Conditions", link: "" },
-    { label: "Return Policy", link: "" },
-    { label: "Support Policy", link: "" },
-    { label: "Privacy Policy", link: "" },
+    { label: "Terms & Conditions", link: "/policies/terms-conditions" },
+    { label: "Return Policy", link: "/policies/return-policy" },
+    { label: "Support Policy", link: "/policies/support-policy" },
+    { label: "Privacy Policy", link: "/policies/privacy-policy" },
+    { label: "Refund Policy", link: "/policies/refund-policy" },
 ];
 
 const socialLinks = [
@@ -59,22 +39,20 @@ const socialLinks = [
 ];
 
 export default function Footer() {
-    const [shopAllItems, setShopAllItems] = useState<ShopAllItem[]>([]);
-    const [isShopAllLoading, setIsShopAllLoading] = useState(true);
-
+    const [categories, setCategories] = useState<CategoryItem[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const getcurrentyear = new Date().getFullYear();
 
     useEffect(() => {
-        // const getcurrentyear = new Date().getFullYear();
         loadCategories();
     }, []);
 
     async function loadCategories() {
-        setIsShopAllLoading(true);
+        setIsLoading(true);
         try {
             const res = await getCategoryList<any>();
             const rows = res?.data ?? [];
-            setShopAllItems(
+            setCategories(
                 rows.map((cat: any) => ({
                     label: cat.name,
                     link: `/all-products?categoryId=${cat.id}&categoryName=${encodeURIComponent(cat.name)}`,
@@ -83,12 +61,11 @@ export default function Footer() {
         } catch (err) {
             console.error("Error fetching categories for footer:", err);
         } finally {
-            setIsShopAllLoading(false);
+            setIsLoading(false);
         }
     }
 
-
-
+    const shopLinks = categories.slice(0, 6);
 
     return (
         <>
@@ -111,12 +88,12 @@ export default function Footer() {
             <div className="shop-all">
                 <div className="shop-all-div">
                     <h3 className="mb-3">Shop All</h3>
-                    {!isShopAllLoading && (
-                        <ul className="nav ps-0 flex-row column-gap-1">
-                            {shopAllItems.map((item, i) => (
-                                <li className="nav-item mb-1 text-capitalize" key={item.link}>
+                    {!isLoading && (
+                        <ul className="nav ps-0 flex-row flex-wrap column-gap-2 row-gap-2">
+                            {categories.map((item, i) => (
+                                <li className="nav-item text-capitalize shop-all-item" key={item.link}>
                                     <Link href={item.link} className="nav-link">{item.label}</Link>
-                                    {i < shopAllItems.length - 1 && <span className="nav-link">|</span>}
+                                    {i < categories.length - 1 && <span className="separator">|</span>}
                                 </li>
                             ))}
                         </ul>
@@ -143,9 +120,7 @@ export default function Footer() {
                             </div>
                         </div>
                     </div>
-
                     <br />
-
                     <div className="footer-middle">
                         <div className="footer-item mb-2">
                             <li className="nav-item mb-2 text-white">Follow Us on Social Media</li>
@@ -162,7 +137,6 @@ export default function Footer() {
                                 ))}
                             </ul>
                         </div>
-
                         <div className="footer-item mb-2">
                             <h5>Quick Links</h5>
                             <ul className="nav flex-column">
@@ -173,7 +147,6 @@ export default function Footer() {
                                 ))}
                             </ul>
                         </div>
-
                         <div className="footer-item mb-2">
                             <h5>Help</h5>
                             <ul className="nav flex-column">
@@ -184,32 +157,28 @@ export default function Footer() {
                                 ))}
                             </ul>
                         </div>
-
                         <div className="footer-item mb-2">
                             <h5>Shop</h5>
                             <ul className="nav flex-column">
-                                {shopLinks.map((item) => (
+                                {!isLoading && shopLinks.map((item) => (
                                     <li className="nav-item mb-2" key={item.label}>
                                         <Link className="p-0" href={item.link || "#"}>{item.label}</Link>
                                     </li>
                                 ))}
                             </ul>
                         </div>
-
                         <div className="footer-item mb-2">
                             <h5>Policies</h5>
                             <ul className="nav flex-column">
                                 {policyLinks.map((item) => (
                                     <li className="nav-item mb-2" key={item.label}>
-                                        <Link className="p-0" href={item.link || "#"}>{item.label}</Link>
+                                        <Link className="p-0" href={item.link || "#"} target="_blank" rel="noreferrer">{item.label}</Link>
                                     </li>
                                 ))}
                             </ul>
                         </div>
                     </div>
-
                     <hr className="mt-3 mb-4" />
-
                     <div className="footer-bottom">
                         <div className="footer-item mb-2">
                             <div className="footer-bottom-icon"><i className="bx bx-mail-open text-white"></i></div>
@@ -222,19 +191,18 @@ export default function Footer() {
                             <div className="footer-bottom-icon"><i className="bx bx-phone-forwarding text-white"></i></div>
                             <div className="footer-bottom-content w-100">
                                 <h6 className="mb-1">Phone No</h6>
-                                <a href="tel:+918825522322"><h5 className="mb-0">+91 88255 22322</h5></a>
+                                <a href="tel:+919840480118"><h5 className="mb-0">+91 98404 80118</h5></a>
                             </div>
                         </div>
                         <div className="footer-item mb-2">
                             <div className="footer-bottom-icon"><i className="bx bx-location text-white"></i></div>
                             <div className="footer-bottom-content">
                                 <h6 className="mb-1">Address</h6>
-                                <a href="#"><h5 className="mb-0">423 B, 4th St, Raja Nagar, Poyampalayam, Tirupur, Tamil Nadu 641603</h5></a>
+                                <a href="#"><h5 className="mb-0">Fly Birds 819B, Boyampalayam Rd, Raja Nagar, Poyampalayam, Tiruppur, Chettipalayam, Tamil Nadu 641603</h5></a>
                             </div>
                         </div>
                     </div>
                 </div>
-
                 <div className="footer-copyrights mt-3">
                     <h6 className="text-center mb-0">© {getcurrentyear} FLYBIRDS LEGGINGS All Rights Reserved.</h6>
                     <h6 className="text-center mb-0">Design & Developed by <a href="https://www.zinivd.com/" target="_blank" className="text-white1">Zinivd</a></h6>

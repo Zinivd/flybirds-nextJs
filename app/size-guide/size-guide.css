@@ -1,0 +1,63 @@
+.size-guide-page {
+    width: 90%;
+    max-width: 800px;
+    margin: 50px auto 90px;
+}
+.size-tag {
+    display: inline-block;
+    background: #fce4f0;
+    color: #E9047C;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+}
+.size-guide-page h1 {
+    font-size: 30px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 12px;
+}
+.size-intro {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.7;
+    margin-bottom: 32px;
+}
+.size-table-wrap {
+    overflow-x: auto;
+    margin-bottom: 40px;
+}
+.size-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.size-table th, .size-table td {
+    padding: 14px 18px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+.size-table th {
+    background: #faf9fa;
+    font-size: 13px;
+    text-transform: uppercase;
+    color: #888;
+}
+.size-table td {
+    font-size: 15px;
+    color: #222;
+    font-weight: 500;
+}
+.size-tips h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 14px;
+}
+.size-tips li {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.7;
+    margin-bottom: 8px;
+}

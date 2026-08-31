@@ -1,5 +1,6 @@
 // export const API_URL = "http://127.0.0.1:8000/api";
-export const API_URL = "https://backend-dev.flybirdsleggings.com/api";
+export const API_URL = "https://api-prod.flybirdsleggings.com/api";
+// export const API_URL = "https://backend-dev.flybirdsleggings.com/api";
 
 // ---------- Delhivery Tracking (customer-facing) ----------
 interface TrackOrderResponse {
@@ -533,3 +534,27 @@ export async function trackOrder<T = TrackOrderResponse>(
   if (!res.ok) throw { error: data };
   return data;
 }
+
+
+export async function getSpotlights<T>(): Promise<T> {
+  const res = await fetch(`${API_URL}/spotlights`, { headers: getHeaders() });
+  if (!res.ok) throw new Error("Get Spotlights API error");
+  return res.json();
+}
+ 
+// ---------- Blogs ----------
+// GET /blogs -> { status, message, data: { data: BlogItem[], ... (paginated) } }
+export async function getBlogs<T>(): Promise<T> {
+  const res = await fetch(`${API_URL}/blogs`, { headers: getHeaders() });
+  if (!res.ok) throw new Error("Get Blogs API error");
+  return res.json();
+}
+ 
+// GET /blogs/{id} -> { status, message, data: BlogItem }
+export async function getBlogById<T>(id: number | string): Promise<T> {
+  const res = await fetch(`${API_URL}/blogs/${id}`, { headers: getHeaders() });
+  const data = await res.json();
+  if (!res.ok) throw { error: data };
+  return data;
+}
+ 

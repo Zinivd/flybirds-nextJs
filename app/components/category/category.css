@@ -1,5 +1,5 @@
 .category-box {
-    width: 100%;
+    width: 200px;
     margin: auto;
 }
 
@@ -29,7 +29,7 @@
 
 @media screen and (min-width: 1098px) {
     .category-box img {
-        height: 300px;
+        height: 276px;
     }
 
     .category-box h6 {

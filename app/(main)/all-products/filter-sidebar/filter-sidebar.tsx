@@ -6,18 +6,12 @@ interface Category {
     name: string;
     type: string;
 }
-interface Color {
-    id: number;
-    name: string;
-    code: string;
-}
+
 interface FilterSidebarProps {
     suffix: "desktop" | "mobile";
     categories: Category[];
-    colors: Color[];
     sizes: string[];
     selectedCategories: number[];
-    selectedColors: number[];
     selectedSizes: string[];
     openSections: Record<string, boolean>;
     values: [number, number];
@@ -27,7 +21,6 @@ interface FilterSidebarProps {
     trackBackground: string;
     toggleSection: (section: string) => void;
     toggleCategory: (id: number, checked: boolean) => void;
-    toggleColor: (id: number, checked: boolean) => void;
     toggleSize: (size: string, checked: boolean) => void;
     onMinInput: (value: string) => void;
     onMaxInput: (value: string) => void;
@@ -37,10 +30,8 @@ interface FilterSidebarProps {
 export default function FilterSidebar({
     suffix,
     categories,
-    colors,
     sizes,
     selectedCategories,
-    selectedColors,
     selectedSizes,
     openSections,
     values,
@@ -50,7 +41,6 @@ export default function FilterSidebar({
     trackBackground,
     toggleSection,
     toggleCategory,
-    toggleColor,
     toggleSize,
     onMinInput,
     onMaxInput,
@@ -64,19 +54,16 @@ export default function FilterSidebar({
                 </div>
             </li>
             <hr className="border-0" />
-            {/* Sub Category */}
+
+            {/* Category — always expanded, no collapse toggle. Shows every
+                category; whichever one(s) arrived via the URL stay checked. */}
             <div className="filter-header mb-0">
-                <li
-                    className="mb-0 filter-row"
-                    onClick={() => toggleSection("category")}
-                    aria-expanded={openSections["category"]}
-                >
+                <li className="mb-0 filter-row filter-row-static">
                     <div className="body-head d-flex justify-content-between align-items-center">
-                        <h6 className="mb-0 text-dark filter-label">Sub Category</h6>
-                        <i className={`fas fa-chevron-down filter-caret ${openSections["category"] ? "rotated" : ""}`}></i>
+                        <h6 className="mb-0 text-dark filter-label">Category</h6>
                     </div>
                 </li>
-                <div className={`collapse ${openSections["category"] ? "show" : ""}`} id={`category-${suffix}`}>
+                <div className="collapse show" id={`category-${suffix}`}>
                     <div className="px-3 py-2">
                         {categories.map((category) => (
                             <div className="form-check mb-2" key={category.id}>
@@ -95,40 +82,8 @@ export default function FilterSidebar({
                     </div>
                 </div>
             </div>
-            {/* Color */}
-            <div className="filter-header mb-0">
-                <li
-                    className="mb-0 filter-row"
-                    onClick={() => toggleSection("color")}
-                    aria-expanded={openSections["color"]}
-                >
-                    <div className="body-head d-flex justify-content-between align-items-center">
-                        <h6 className="mb-0 text-dark filter-label">Color</h6>
-                        <i className={`fas fa-chevron-down filter-caret ${openSections["color"] ? "rotated" : ""}`}></i>
-                    </div>
-                </li>
-                <div className={`collapse ${openSections["color"] ? "show" : ""}`} id={`color-${suffix}`}>
-                    <div className="colors py-2">
-                        {colors.map((item) => (
-                            <div className="mb-3 text-center" key={item.id}>
-                                <li
-                                    className={`color-box mx-auto ${selectedColors.includes(item.id) ? "active" : ""}`}
-                                    style={{ backgroundColor: item.code }}
-                                    onClick={() => toggleColor(item.id, !selectedColors.includes(item.id))}
-                                >
-                                    {selectedColors.includes(item.id) && (
-                                        <span className="tick">
-                                            <i className="fas fa-check"></i>
-                                        </span>
-                                    )}
-                                </li>
-                                <span className="color-label">{item.name}</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-            {/* Size */}
+
+            {/* Size — fixed list, no longer fetched */}
             <div className="filter-header mb-0">
                 <li
                     className="mb-0 filter-row"
@@ -146,7 +101,9 @@ export default function FilterSidebar({
                             <li className="mb-2" key={item}>
                                 <button
                                     type="button"
-                                    className={`size-btn mx-auto ${selectedSizes.includes(item) ? "active" : ""}`}
+                                    className={`size-btn mx-auto ${item.includes("/") ? "size-btn-wide" : ""} ${
+                                        selectedSizes.includes(item) ? "active" : ""
+                                    }`}
                                     onClick={() => toggleSize(item, !selectedSizes.includes(item))}
                                 >
                                     <span>{item}</span>
@@ -161,7 +118,8 @@ export default function FilterSidebar({
                     </div>
                 </div>
             </div>
-            {/* Price */}
+
+            {/* Price — fixed 0 to 1000 */}
             <div className="filter-header mb-0">
                 <li
                     className="mb-0 filter-row"
@@ -202,6 +160,7 @@ export default function FilterSidebar({
                     </div>
                 </div>
             </div>
+
             <div className="px-3 pt-3 pb-2">
                 <button className="btn btn-outline-secondary w-100" onClick={resetFilters}>
                     Reset

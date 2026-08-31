@@ -30,16 +30,171 @@
     justify-content: space-between;
     align-items: start;
 }
+
+/* ===================== PRODUCT GRID (4-up, matches Figma) =====================
+   Everything below is scoped under .filter-product-grid so it can never
+   leak onto the shared <Products /> card used elsewhere (home page
+   Best Sellers / Trending), which reuses the same product-box / product-img
+   class names via its own product.css. */
 .filter-product-grid {
     display: grid;
-    align-items: start;
-    justify-content: space-between;
-    row-gap: 30px;
+    gap: 32px;
+    row-gap: 32px;
+    overflow: visible;
+    padding-bottom: 0;
 }
 .filter-product-grid .product-box {
-    flex: 0px !important;
-    width: 100% !important;
+    width: 100%;
+    max-width: 327px;
+    margin: 0 auto;
+    flex: unset !important;
 }
+.filter-product-grid .product-box:nth-child(4n+1) .product-img {
+    background-color: #F1EEFA;
+}
+.filter-product-grid .product-box:nth-child(4n+2) .product-img {
+    background-color: #EAF6FF;
+}
+.filter-product-grid .product-box:nth-child(4n+3) .product-img {
+    background-color: #FDF0F0;
+}
+.filter-product-grid .product-box:nth-child(4n+4) .product-img {
+    background-color: #EEF4EE;
+}
+.filter-product-grid .product-img {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 327 / 420;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    overflow: hidden;
+}
+.filter-product-grid .product-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    border-radius: 12px;
+    transition: all var(--transition, 0.25s ease);
+}
+.filter-product-grid .product-box img:hover {
+    transform: scale(1.03);
+}
+.filter-product-grid .product-badge {
+    position: absolute;
+    background-color: #EC1A6E;
+    color: #fff;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 6px 14px;
+    bottom: 0;
+    left: 0;
+}
+.filter-product-grid .product-box-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+    margin-top: 16px;
+}
+.filter-product-grid .product-box-content h4 {
+    color: var(--text-primary, #333);
+    font-weight: 500;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.filter-product-grid .product-box-content h4 i {
+    color: #F5A623;
+}
+.filter-product-grid .product-box-content h3 {
+    color: #1A1A1A;
+    font-weight: 700;
+    font-size: 20px;
+    margin: 2px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.filter-product-grid .product-box-content h6 {
+    color: #8A8A8A;
+    font-weight: 400;
+    font-size: 15px;
+    margin-bottom: 4px;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.filter-product-grid .product-box-content h5 {
+    color: #1A1A1A;
+    font-weight: 700;
+    font-size: 20px;
+    margin-top: 4px;
+}
+.filter-product-grid .product-box-content h5 span {
+    color: #A0A0A0;
+    font-weight: 500;
+    font-size: 15px;
+    text-decoration: line-through;
+    margin-left: 6px;
+}
+.filter-product-grid .product-colors-div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+.filter-product-grid .colors-round {
+    height: 22px;
+    width: 22px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px #e0e0e0;
+}
+.filter-product-grid .product-colors-main span {
+    color: #8A8A8A;
+    font-weight: 500;
+    font-size: 14px;
+    margin-left: 4px;
+}
+.filter-product-grid .product-box-content p {
+    color: #2E9E4E;
+    font-weight: 600;
+    font-size: 14px;
+}
+.filter-product-grid .product-cart-btn {
+    width: 100%;
+    position: absolute;
+    bottom: 0%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+}
+.filter-product-grid .product-box:hover .product-cart-btn {
+    bottom: 5%;
+    opacity: 1;
+    transition: all var(--transition, 0.25s ease);
+}
+.filter-product-grid .product-box:hover .product-badge {
+    opacity: 0;
+    transition: all var(--transition, 0.25s ease);
+}
+.filter-product-grid .add-cart-btn-2 {
+    display: none;
+}
+
 .select-div {
     width: 250px;
     display: flex;
@@ -70,7 +225,7 @@
         grid-template-columns: 22% 77%;
     }
     .filter-product-grid {
-        grid-template-columns: repeat(4, 24%);
+        grid-template-columns: repeat(4, 1fr);
     }
 }
 @media screen and (min-width: 767px) and (max-width: 1098px) {
@@ -78,7 +233,7 @@
         grid-template-columns: 28% 71%;
     }
     .filter-product-grid {
-        grid-template-columns: repeat(3, 33%);
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 @media screen and (max-width: 767px) {
@@ -94,13 +249,21 @@
         column-gap: 5px;
     }
     .filter-product-grid {
-        grid-template-columns: repeat(2, 48%);
+        grid-template-columns: repeat(2, 1fr);
         gap: 15px;
+        row-gap: 20px;
+    }
+    .filter-product-grid .product-cart-btn {
+        display: none !important;
+    }
+    .filter-product-grid .add-cart-btn-2 {
+        display: flex;
     }
     .select-div {
         display: none !important;
     }
 }
+
 /* ===== Filter Card ===== */
 .flex-sidebar {
     height: 100%;
@@ -132,6 +295,9 @@
 .filter-row {
     cursor: pointer;
     padding: 12px 15px !important;
+}
+.filter-row-static {
+    cursor: default;
 }
 .filter-label {
     font-size: 12px;
@@ -178,6 +344,7 @@
         display: none;
     }
 }
+
 /* ===== Price range ===== */
 .dual-range {
     position: relative;
@@ -224,67 +391,19 @@
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
     cursor: pointer;
 }
-/* ===== Colors grid ===== */
-.colors {
-    display: grid;
-    grid-template-columns: repeat(4, 23%);
-    align-items: start;
-    justify-content: space-between;
-    padding: 0 15px;
-}
-.color-box {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    cursor: pointer;
-    position: relative;
-    transition: transform 0.2s ease;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-}
-.color-box:hover {
-    transform: scale(1.08);
-}
-.color-box.active {
-    outline: 2px solid var(--main, #ec1361);
-    outline-offset: 2px;
-    transform: scale(1.05);
-}
-.color-box .tick {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    width: 15px;
-    height: 15px;
-    background: var(--main, #ec1361);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1.5px solid #fff;
-}
-.color-box .tick i {
-    font-size: 8px;
-    color: #fff;
-}
-.color-label {
-    display: block;
-    margin-top: 4px;
-    font-size: 10px;
-    font-weight: var(--fw-md);
-    color: var(--text-primary, #555);
-}
-/* ===== Size grid ===== */
+
+/* ===== Size grid — flex-wrap so combo sizes like "2XL/3XL" fit ===== */
 .sizes {
-    display: grid;
-    grid-template-columns: repeat(4, 23%);
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 6px 15px 0;
 }
 .size-btn {
     position: relative;
-    width: 100%;
-    aspect-ratio: 1 / 1;
+    min-width: 50px;
+    height: 42px;
+    padding: 0 12px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -296,6 +415,10 @@
     color: #333;
     cursor: pointer;
     transition: all 0.2s ease;
+}
+.size-btn-wide {
+    min-width: 70px;
+    padding: 0 14px;
 }
 .size-btn:hover {
     border-color: var(--main, #ec1361);

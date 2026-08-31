@@ -2,67 +2,36 @@
     display: grid;
     align-items: start;
     justify-content: space-between;
+    margin: 24px 0px;
 }
 
-/* Detail Spotlight — kept as an empty panel, no gradient / decorative
-   background until real imagery is supplied. Matches the neutral
-   bordered look of the rest of the page instead of standing out. */
+/* Detail Spotlight — shows product.spotlight_image; falls back to a
+   neutral bordered placeholder heading when no image is set. */
 .product-description-left {
-    background: transparent;
-    border: 2px dashed var(--border);
+    width: 564px;
+    height: 710px;
+    background: #FAF1E6;
+    border: 2px solid var(--border);
     border-radius: 10px;
-    height: 100%;
-    min-height: 120px;
+    overflow: hidden;
     display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
+    align-items: stretch;
+    justify-content: center;
 }
-
+.product-description-left .spotlight-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+/* Placeholder (no image) needs its own padding + heading style */
+.product-description-left .body-head {
+    padding: 20px;
+    width: 100%;
+}
 .product-description-left .body-head h4 {
     color: var(--text-primary);
     font-weight: var(--fw-lg);
-}
-
-.product-description-left .description-main-img {
-    width: 100%;
-    filter: drop-shadow(0px 0px 2px rgb(255, 255, 255));
-}
-
-.product-description-left .description-img-column {
-    display: grid;
-    align-items: start;
-    justify-content: space-between;
-}
-
-.product-description-left .description-img-div {
-    position: relative;
-    border-radius: 50% !important;
-}
-
-.product-description-left .description-img-div .description-img {
-    border-radius: 50%;
-    background-color: var(--pink);
-    overflow: hidden;
-    border: 2px solid var(--main);
-}
-
-.product-description-left .description-img-div img {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    object-fit: contain;
-}
-
-.product-description-left .description-img-div h6 {
-    position: absolute;
-    display: inline-block;
-    color: var(--secondary);
-    font-weight: var(--fw-sm);
-    font-size: 11px;
-    top: 100%;
-    width: 100%;
-    text-align: center;
-    border-radius: 50%;
 }
 
 .product-description-right {
@@ -71,7 +40,6 @@
     border-radius: 10px;
     height: 100%;
 }
-
 /* Plain-text product description: preserves paragraph breaks that
    htmlToPlainText() converts from the API's HTML, with no raw tags. */
 .product-description-right .description-text {
@@ -86,7 +54,6 @@
     align-items: start;
     justify-content: space-between;
 }
-
 .fabric-div {
     display: flex;
     align-items: center;
@@ -94,7 +61,6 @@
     flex-direction: column;
     gap: 8px;
 }
-
 .fabric-img {
     border: 2px solid var(--border);
     overflow: hidden;
@@ -103,14 +69,12 @@
     align-items: center;
     justify-content: center;
 }
-
 .fabric-img img {
     width: 50%;
     height: 50%;
     object-fit: contain;
     margin: auto;
 }
-
 .fabric-div h6 {
     color: var(--text-primary);
     font-weight: var(--fw-sm);
@@ -118,41 +82,19 @@
 
 @media screen and (min-width: 1098px) {
     .product-description-main {
-        grid-template-columns: 32% 66%;
+        grid-template-columns: 564px 1fr;
         column-gap: 20px;
     }
-
-    .product-description-left {
-        padding: 20px;
-    }
-
-    .product-description-left .description-main-img {
-        height: 500px;
-        object-fit: cover;
-    }
-
-    .product-description-left .description-img-column {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .product-description-left .description-img-div .description-img {
-        height: 90px;
-        width: 90px;
-    }
-
     .product-description-right {
         padding: 20px;
     }
-
     .fabric-grid {
         grid-template-columns: repeat(7, 1fr);
     }
-
     .fabric-img {
         width: 70px;
         height: 70px;
     }
-
     .fabric-div h6 {
         font-size: 12px;
     }
@@ -160,41 +102,23 @@
 
 @media screen and (min-width: 767px) and (max-width: 1098px) {
     .product-description-main {
-        grid-template-columns: 36% 60%;
+        grid-template-columns: 40% 58%;
         column-gap: 20px;
     }
-
     .product-description-left {
-        padding: 18px;
+        width: 100%;
+        height: 500px;
     }
-
-    .product-description-left .description-main-img {
-        height: 400px;
-        object-fit: cover;
-    }
-
-    .product-description-left .description-img-column {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .product-description-left .description-img-div .description-img {
-        height: 80px;
-        width: 80px;
-    }
-
     .product-description-right {
         padding: 15px;
     }
-
     .fabric-grid {
         grid-template-columns: repeat(4, 1fr);
     }
-
     .fabric-img {
         width: 40px;
         height: 40px;
     }
-
     .fabric-div h6 {
         font-size: 10px;
     }
@@ -205,115 +129,21 @@
         grid-template-columns: repeat(1, 1fr);
         row-gap: 16px;
     }
-
     .product-description-left {
-        padding: 16px;
-        min-height: 60px;
+        width: 100%;
+        height: 360px;
     }
-
-    .product-description-left .description-main-img {
-        height: 300px;
-        object-fit: cover;
-    }
-
-    .product-description-left .description-img-column {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .product-description-left .description-img-div .description-img {
-        height: 60px;
-        width: 60px;
-    }
-
     .product-description-right {
         padding: 12px;
     }
-
     .fabric-grid {
         grid-template-columns: repeat(3, 1fr);
     }
-
     .fabric-img {
         width: 40px;
         height: 40px;
     }
-
     .fabric-div h6 {
         font-size: 10px;
     }
-}
-
-.product-details {
-    width: 92%;
-    margin: auto;
-}
-
-.product-description-main {
-    margin: 24px 0px;
-}
-
-.product-review-main {
-    background: url('/assets/images/Review/1.png'), url('/assets/images/Review/2.png'), #FAE6F6;
-    background-position: top left, right top;
-    background-repeat: no-repeat, no-repeat;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-}
-
-.product-review-div {
-    margin: auto;
-}
-
-@media screen and (min-width: 1098px) {
-    .product-review-main {
-        padding: 26px 0px;
-        background-size: 180px, 180px;
-    }
-
-    .product-review-div {
-        width: 85%;
-    }
-}
-
-@media screen and (min-width: 767px) and (max-width: 1098px) {
-    .product-review-main {
-        padding: 24px 0px;
-        background-size: 160px, 160px;
-    }
-
-    .product-review-div {
-        width: 90%;
-    }
-}
-
-@media screen and (max-width: 767px) {
-    .product-review-main {
-        padding: 18px 0px;
-        background-size: 90px, 90px;
-    }
-
-    .product-review-div {
-        width: 95%;
-    }
-}
-
-.custom-modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1050;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-}
-
-.custom-modal-box {
-    background: var(--bg-card, #fff);
-    border-radius: 12px;
-    padding: 1.5rem;
-    width: 100%;
-    max-width: 480px;
-    max-height: 90vh;
-    overflow-y: auto;
 }

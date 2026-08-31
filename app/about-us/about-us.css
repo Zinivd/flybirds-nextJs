@@ -1,0 +1,152 @@
+.about-hero {
+    background: linear-gradient(270deg, #E9047C 0%, #44122C 100%);
+    color: #fff;
+    text-align: center;
+    padding: 70px 20px;
+}
+.about-breadcrumb {
+    display: block;
+    font-size: 13px;
+    opacity: 0.8;
+    margin-bottom: 10px;
+}
+.about-hero h1 {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+.about-hero p {
+    max-width: 700px;
+    margin: 0 auto;
+    font-size: 15px;
+    line-height: 1.7;
+    opacity: 0.9;
+}
+.about-tag {
+    display: inline-block;
+    background: #fce4f0;
+    color: #E9047C;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+}
+.about-process {
+    width: 90%;
+    max-width: 1100px;
+    margin: 60px auto;
+}
+.about-process-header {
+    text-align: center;
+    margin-bottom: 36px;
+}
+.about-process-header h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #222;
+}
+.about-process-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+}
+.about-process-card {
+    background: #faf9fa;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 24px 18px;
+    transition: 0.25s ease;
+}
+.about-process-card:hover {
+    border-color: #E9047C;
+    transform: translateY(-4px);
+}
+.about-step-number {
+    display: block;
+    font-size: 26px;
+    font-weight: 800;
+    color: #E9047C;
+    opacity: 0.4;
+    margin-bottom: 8px;
+}
+.about-process-card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #222;
+}
+.about-process-card p {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.6;
+}
+.about-why {
+    background: #292933;
+    padding: 60px 20px;
+}
+.about-why-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    color: #fff;
+}
+.about-why-inner h2 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+.about-why-inner > p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: #ddd;
+    margin-bottom: 30px;
+}
+.about-motto {
+    background: rgba(233, 4, 124, 0.1);
+    border: 1px solid rgba(233, 4, 124, 0.3);
+    border-radius: 12px;
+    padding: 24px;
+}
+.about-motto h4 {
+    color: #E9047C;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+.about-motto p {
+    font-size: 14px;
+    color: #ddd;
+    line-height: 1.6;
+}
+.about-cta {
+    text-align: center;
+    padding: 60px 20px 80px;
+}
+.about-cta h2 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #222;
+}
+.about-cta p {
+    max-width: 600px;
+    margin: 0 auto 24px;
+    color: #666;
+    font-size: 14px;
+}
+.about-cta-btn {
+    display: inline-block;
+    background: linear-gradient(270deg, #E9047C 0%, #44122C 100%);
+    color: #fff;
+    padding: 12px 32px;
+    border-radius: 30px;
+    font-weight: 600;
+    text-decoration: none;
+}
+@media (max-width: 991px) {
+    .about-process-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+    .about-process-grid { grid-template-columns: 1fr; }
+    .about-hero h1 { font-size: 26px; }
+}

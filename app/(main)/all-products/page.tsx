@@ -1,11 +1,10 @@
-// app/(main)/all-products/page.tsx
 "use client";
 import { Suspense, useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Products from "@/app/components/product/product";
 import FilterSidebar from "@/app/(main)/all-products/filter-sidebar/filter-sidebar";
-import { getCategoryList, getColors, getProducts } from "@/app/lib/api";
+import { getCategoryList, getProducts } from "@/app/lib/api";
 import "./all-products.css";
 
 interface Category {
@@ -13,68 +12,84 @@ interface Category {
     name: string;
     type: string;
 }
-interface Color {
-    id: number;
-    name: string;
-    code: string;
-}
 
 const MIN = 0;
-const MAX = 10000;
+const MAX = 1000;
 const STEP = 10;
+
 const sortOptions = [
     { value: "0", label: "Default" },
     { value: "1", label: "Price : Low to High" },
     { value: "2", label: "Price : High to Low" },
 ];
-const sizes = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL"];
+
+// Fixed size list — sizes are no longer fetched from an API.
+const sizes = [
+    "2XS", "XS", "S", "M", "L", "XL", "XXL", "3XL", "4XL", "4XL+",
+    "S/M", "L/XL", "2XL/3XL", "4XL/5XL", "6XL/7XL",
+];
+
+function parseIdList(param: string | null): number[] {
+    if (!param) return [];
+    return param
+        .split(",")
+        .map((v) => Number(v.trim()))
+        .filter((n) => !Number.isNaN(n));
+}
+
+function parseNameList(param: string | null): string[] {
+    if (!param) return [];
+    return decodeURIComponent(param)
+        .split(",")
+        .map((v) => v.trim())
+        .filter(Boolean);
+}
 
 function AllProductsInner() {
     const searchParams = useSearchParams();
     const categoryIdParam = searchParams.get("categoryId");
-    const categoryId = categoryIdParam ? Number(categoryIdParam) : null;
     const categoryNameParam = searchParams.get("categoryName");
-    const categoryName = categoryNameParam ? decodeURIComponent(categoryNameParam) : "";
+
+    const initialCategoryIds = parseIdList(categoryIdParam);
+    const categoryNames = parseNameList(categoryNameParam);
+    const categoryNameDisplay = categoryNames.join(" & ");
 
     const [products, setProducts] = useState<any[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
-    const [colors, setColors] = useState<Color[]>([]);
-    const [selectedCategories, setSelectedCategories] = useState<number[]>(categoryId ? [categoryId] : []);
-    const [selectedColors, setSelectedColors] = useState<number[]>([]);
+    const [selectedCategories, setSelectedCategories] = useState<number[]>(initialCategoryIds);
     const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [sortBy, setSortBy] = useState("0");
+    // Category is always expanded now — only Price (and any future section) can collapse.
     const [openSections, setOpenSections] = useState<Record<string, boolean>>({
-        category: false,
+        category: true,
         price: false,
-        color: false,
         size: false,
     });
-    const [values, setValues] = useState<[number, number]>([0, 5000]);
+    const [values, setValues] = useState<[number, number]>([MIN, MAX]);
 
     const loadProducts = useCallback(
         async (
             overrides: {
                 categories?: number[];
-                colors?: number[];
                 sizes?: string[];
                 priceValues?: [number, number];
                 sort?: string;
             } = {}
         ) => {
             const cats = overrides.categories ?? selectedCategories;
-            const cols = overrides.colors ?? selectedColors;
             const szs = overrides.sizes ?? selectedSizes;
             const [minV, maxV] = overrides.priceValues ?? values;
             const sort = overrides.sort ?? sortBy;
+
             const queryParams: any = {
                 min_price: minV,
                 max_price: maxV,
             };
-            // No category_id sent at all when nothing is selected -> backend returns everything
+            // No category_id sent at all when nothing is selected -> backend returns everything.
             if (cats.length) queryParams.category_id = cats.join(",");
-            if (cols.length) queryParams.color_id = cols.join(",");
             if (szs.length) queryParams.size = szs.join(",");
+
             switch (sort) {
                 case "1":
                     queryParams.sort = "price_asc";
@@ -85,31 +100,30 @@ function AllProductsInner() {
                 default:
                     queryParams.sort = "";
             }
+
             setIsLoading(true);
             try {
                 const res = await getProducts<any>(queryParams);
-                const mapped = res.data.data.map((item: any) => {
-                    const itemColors = item.color_variants || [];
-                    return {
-                        id: item.id,
-                        title: item.name,
-                        subtitle: item.brand,
-                        image: itemColors[0]?.gallery_images?.[0]?.image_url || "/assets/images/no-image.png",
-                        badge: item.discount > 0 ? `${item.discount}% OFF` : "",
-                        rating: 5,
-                        review: 0,
-                        sp: item.effective_price,
-                        mrp: item.unit_price,
-                        category: item.category,
-                        category_id: item.category_id,
-                        color_variants: itemColors,
-                        colors: itemColors.map((variant: any) => ({
-                            id: variant.color.id,
-                            name: variant.color.name,
-                            code: variant.color.code,
-                        })),
-                    };
-                });
+                // IMPORTANT: keys here must match what the shared Products
+                // component (product.tsx) actually reads — name, tags,
+                // brand, spotlight_image, unit_price, effective_price,
+                // color_variants. Previously this mapped to title/mrp/sp,
+                // which the component never looked at, so cards rendered
+                // blank/placeholder images and no price.
+                const mapped = (res.data?.data ?? []).map((item: any) => ({
+                    id: item.id,
+                    name: item.name,
+                    brand: item.brand,
+                    tags: item.tags,
+                    spotlight_image: item.spotlight_image,
+                    unit_price: item.unit_price,
+                    effective_price: item.effective_price,
+                    discount: item.discount,
+                    badge: Number(item.discount) > 0 ? `${item.discount}% OFF` : "",
+                    category: item.category,
+                    category_id: item.category_id,
+                    color_variants: item.color_variants || [],
+                }));
                 setProducts(mapped);
             } catch {
                 // silent
@@ -117,7 +131,7 @@ function AllProductsInner() {
                 setIsLoading(false);
             }
         },
-        [selectedCategories, selectedColors, selectedSizes, values, sortBy]
+        [selectedCategories, selectedSizes, values, sortBy]
     );
 
     useEffect(() => {
@@ -129,59 +143,53 @@ function AllProductsInner() {
                 // silent
             }
         }
-        async function loadColors() {
-            try {
-                const res = await getColors<any>();
-                setColors(res.data);
-            } catch {
-                // silent
-            }
-        }
         loadCategories();
-        loadColors();
-        const initialCats = categoryId ? [categoryId] : [];
+
+        const initialCats = parseIdList(categoryIdParam);
         setSelectedCategories(initialCats);
         loadProducts({ categories: initialCats });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [categoryId]);
+    }, [categoryIdParam]);
 
     function toggleSection(section: string) {
+        // Category stays permanently open — ignore toggle attempts on it.
+        if (section === "category") return;
         setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
     }
+
     function toggleCategory(id: number, checked: boolean) {
         const next = checked ? [...selectedCategories, id] : selectedCategories.filter((x) => x !== id);
         setSelectedCategories(next);
         loadProducts({ categories: next });
     }
-    function toggleColor(id: number, checked: boolean) {
-        const next = checked ? [...selectedColors, id] : selectedColors.filter((x) => x !== id);
-        setSelectedColors(next);
-        loadProducts({ colors: next });
-    }
+
     function toggleSize(size: string, checked: boolean) {
         const next = checked ? [...selectedSizes, size] : selectedSizes.filter((x) => x !== size);
         setSelectedSizes(next);
         loadProducts({ sizes: next });
     }
+
     function onMinInput(value: string) {
         const next: [number, number] = [Math.min(+value, values[1]), values[1]];
         setValues(next);
         loadProducts({ priceValues: next });
     }
+
     function onMaxInput(value: string) {
         const next: [number, number] = [values[0], Math.max(+value, values[0])];
         setValues(next);
         loadProducts({ priceValues: next });
     }
+
     function resetFilters() {
-        const cats = categoryId ? [categoryId] : [];
+        const cats = parseIdList(categoryIdParam);
         setSelectedCategories(cats);
-        setSelectedColors([]);
         setSelectedSizes([]);
-        setValues([0, 5000]);
+        setValues([MIN, MAX]);
         setSortBy("0");
-        loadProducts({ categories: cats, colors: [], sizes: [], priceValues: [0, 5000], sort: "0" });
+        loadProducts({ categories: cats, sizes: [], priceValues: [MIN, MAX], sort: "0" });
     }
+
     function handleSortChange(value: string) {
         setSortBy(value);
         loadProducts({ sort: value });
@@ -198,10 +206,8 @@ function AllProductsInner() {
 
     const sidebarProps = {
         categories,
-        colors,
         sizes,
         selectedCategories,
-        selectedColors,
         selectedSizes,
         openSections,
         values,
@@ -211,7 +217,6 @@ function AllProductsInner() {
         trackBackground,
         toggleSection,
         toggleCategory,
-        toggleColor,
         toggleSize,
         onMinInput,
         onMaxInput,
@@ -225,18 +230,18 @@ function AllProductsInner() {
                     <Link href="/">Home
                         <i className="fas fa-chevron-right ps-1"></i>
                     </Link>
-                    {categoryName ? (
+                    {categoryNameDisplay ? (
                         <>
                             <Link href="/all-products">All Products
                                 <i className="fas fa-chevron-right ps-1"></i>
                             </Link>
-                            <a className="active">{categoryName}</a>
+                            <a className="active">{categoryNameDisplay}</a>
                         </>
                     ) : (
                         <a className="active">All Products</a>
                     )}
                 </h6>
-                <h4>{categoryName || "All Products"}</h4>
+                <h4>{categoryNameDisplay || "All Products"}</h4>
                 <div className="form select-div mb-3">
                     <label htmlFor="sort" className="me-2">Sort By : </label>
                     <select

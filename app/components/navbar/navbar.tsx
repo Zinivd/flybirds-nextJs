@@ -25,7 +25,6 @@ export default function Navbar() {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const router = useRouter();
-
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [categories, setCategories] = useState<CategoryItem[]>([]);
 
@@ -39,8 +38,26 @@ export default function Navbar() {
     const mobileSearchWrapRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        setIsLoggedIn(!!localStorage.getItem("authToken"));
+        setIsLoggedIn(isAuthenticated());
     }, []);
+
+    // Central auth check — used everywhere we need to gate a click.
+    function isAuthenticated() {
+        const authToken = localStorage.getItem("authToken");
+        const userId = localStorage.getItem("userId");
+        return !!(authToken && userId);
+    }
+
+    // Guards any protected nav link (profile, wishlist, cart).
+    // If not logged in, redirect to /login instead of the intended page.
+    function guardedNavigate(e: React.MouseEvent, href: string) {
+        e.preventDefault();
+        if (!isAuthenticated()) {
+            router.push("/login");
+            return;
+        }
+        router.push(href);
+    }
 
     useEffect(() => {
         let cancelled = false;
@@ -187,17 +204,14 @@ export default function Navbar() {
                 </li>
             );
         }
-
         // Map display labels back to the CATEGORY_NAV_MAP keys used above.
         const labelKey =
             item.label === "Shimmer" ? "Shimmer legging" :
             item.label === "Saree Shaper" ? "Saree Shaper" :
             item.label === "Ankle" ? "Ankle legging" :
             item.label;
-
         const href = getCategoryHref(labelKey);
         const categoryId = getCategoryId(labelKey);
-
         // Categories haven't loaded yet, or no match was found — render a
         // disabled placeholder instead of a broken/guessed link.
         if (!href || categoryId === null) {
@@ -209,7 +223,6 @@ export default function Navbar() {
                 </li>
             );
         }
-
         return (
             <li className="nav-item" key={item.label}>
                 <Link href={href} className={`nav-link ${isCategoryActive(categoryId) ? "active" : ""}`}>
@@ -235,8 +248,8 @@ export default function Navbar() {
                                 </Link>
                             </div>
                             <div className="icons-div d-lg-none align-items-center">
-                                <a
-                                    href="#"
+                                
+                                   <a href="#"
                                     onClick={(e) => {
                                         e.preventDefault();
                                         setMobileSearchOpen((v) => !v);
@@ -247,18 +260,26 @@ export default function Navbar() {
                                 <Link
                                     href={{ pathname: "/profile", query: { tab: 3 } }}
                                     className={`nav-link ${isActive("/profile") ? "active" : ""}`}
+                                    onClick={(e) => guardedNavigate(e, "/profile?tab=3")}
                                 >
                                     <i className="bx bx-heart"></i>
                                 </Link>
-                                <Link href="/cart" className={`nav-link ${isActive("/cart") ? "active" : ""}`}>
+                                <Link
+                                    href="/cart"
+                                    className={`nav-link ${isActive("/cart") ? "active" : ""}`}
+                                    onClick={(e) => guardedNavigate(e, "/cart")}
+                                >
                                     <i className="bx bx-shopping-bag"></i>
                                 </Link>
-                                <Link href="/profile" className={`nav-link ${isActive("/profile") ? "active" : ""}`}>
+                                <Link
+                                    href="/profile"
+                                    className={`nav-link ${isActive("/profile") ? "active" : ""}`}
+                                    onClick={(e) => guardedNavigate(e, "/profile")}
+                                >
                                     <i className="bx bx-user"></i>
                                 </Link>
                             </div>
                         </div>
-
                         {mobileSearchOpen && (
                             <div
                                 ref={mobileSearchWrapRef}
@@ -325,12 +346,10 @@ export default function Navbar() {
                                 )}
                             </div>
                         )}
-
                         <ul className="navbar-nav flex-row align-items-center justify-content-between mt-3 response-nav-content">
                             {navLinks.map(renderNavItem)}
                         </ul>
                     </div>
-
                     {/* Web Navbar */}
                     <div className="navbar-collapse d-lg-flex justify-content-evenly align-items-center collapse" id="navbarcontent">
                         <div className="navbar-brand col-lg-1 me-0">
@@ -414,17 +433,28 @@ export default function Navbar() {
                                     href={{ pathname: "/profile", query: { tab: 3 } }}
                                     className={`nav-link nav-icon-btn ${isActive("/profile") ? "active" : ""}`}
                                     title="Wishlist"
+                                    onClick={(e) => guardedNavigate(e, "/profile?tab=3")}
                                 >
                                     <i className="bx bx-heart"></i>
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link href="/cart" className={`nav-link nav-icon-btn ${isActive("/cart") ? "active" : ""}`} title="Cart">
+                                <Link
+                                    href="/cart"
+                                    className={`nav-link nav-icon-btn ${isActive("/cart") ? "active" : ""}`}
+                                    title="Cart"
+                                    onClick={(e) => guardedNavigate(e, "/cart")}
+                                >
                                     <i className="bx bx-shopping-bag"></i>
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link href="/profile" className={`nav-link nav-icon-btn ${isActive("/profile") ? "active" : ""}`} title="Profile">
+                                <Link
+                                    href="/profile"
+                                    className={`nav-link nav-icon-btn ${isActive("/profile") ? "active" : ""}`}
+                                    title="Profile"
+                                    onClick={(e) => guardedNavigate(e, "/profile")}
+                                >
                                     <i className="bx bx-user"></i>
                                 </Link>
                             </li>

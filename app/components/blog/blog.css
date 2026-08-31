@@ -1,0 +1,100 @@
+.blog-box {
+    width: 100%;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: var(--transition);
+}
+.blog-box:hover {
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.08);
+    transform: translateY(-4px);
+}
+.blog-img {
+    display: block;
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+}
+.blog-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition);
+}
+.blog-box:hover .blog-img img {
+    transform: scale(1.06);
+}
+.blog-box-content {
+    padding: 20px;
+}
+.blog-title {
+    font-family: var(--tertiary-font);
+    font-weight: var(--fw-lg);
+    color: var(--text-primary);
+    font-size: 19px;
+    line-height: 1.3;
+    margin-bottom: 10px;
+}
+.blog-desc {
+    color: #6b6b6b;
+    font-size: 14px;
+    line-height: 1.55;
+    margin-bottom: 18px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.blog-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+}
+.blog-date {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #8a8a8a;
+}
+.blog-date i {
+    font-size: 15px;
+}
+.blog-read-link {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--main);
+    font-weight: var(--fw-md);
+    font-size: 14px;
+    transition: var(--transition);
+}
+.blog-read-link i {
+    font-size: 18px;
+    transition: transform var(--transition);
+}
+.blog-read-link:hover i {
+    transform: translateX(3px);
+}
+.blog-grid {
+    display: grid;
+    gap: 25px;
+}
+@media screen and (min-width: 1098px) {
+    .blog-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+@media screen and (min-width: 767px) and (max-width: 1098px) {
+    .blog-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media screen and (max-width: 767px) {
+    .blog-grid {
+        grid-template-columns: 1fr;
+    }
+}

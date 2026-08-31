@@ -37,28 +37,41 @@ export default function Wishlist() {
     }
 
     function mapToProductItem(row: any): ProductItem & { wishlistRowId: number } {
-        const product = row.product || row;
-        const firstVariant = product.color_variants?.[0];
-        const image =
-            firstVariant?.thumbnail_image?.image_url ||
-            firstVariant?.gallery_images?.[0]?.image_url ||
-            "/assets/images/no-image.png";
-
-        return {
-            id: product.id,
-            wishlistRowId: row.id,
-            image,
-            badge: product.badge || "",
-            title: product.name,
-            subtitle: product.brand,
-            rating: product.rating || 5,
-            review: product.review_count || 0,
-            sp: product.effective_price,
-            mrp: product.unit_price,
-            color_variants: product.color_variants || [],
-            category_id: product.category_id,
-        };
-    }
+    const product = row.product || row;
+    const firstVariant = product.color_variants?.[0];
+    const image =
+        firstVariant?.thumbnail_image?.image_url ||
+        firstVariant?.gallery_images?.[0]?.image_url ||
+        "/assets/images/no-image.png";
+    return {
+        id: product.id,
+        wishlistRowId: row.id,
+        name: product.name,
+        brand: product.brand,
+        unit: product.unit ?? "",
+        weight: product.weight ?? "",
+        min_qty: product.min_qty ?? 1,
+        tags: product.tags ?? "",
+        description: product.description ?? "",
+        spotlight_image: image,
+        category_id: product.category_id,
+        unit_price: String(product.unit_price ?? 0),
+        discount: String(product.discount ?? 0),
+        discount_type: product.discount_type ?? "flat",
+        effective_price: Number(product.effective_price ?? product.unit_price ?? 0),
+        reward_points: product.reward_points ?? 0,
+        is_flash_sale: product.is_flash_sale ?? false,
+        is_today_sale: product.is_today_sale ?? false,
+        is_published: product.is_published ?? true,
+        is_active: product.is_active ?? true,
+        total_sold: product.total_sold ?? 0,
+        is_wishlisted: true,
+        rating: product.rating || 5,
+        review: product.review_count || 0,
+        badge: product.badge || "",
+        color_variants: product.color_variants || [],
+    };
+}
 
     async function removeFromWishlist(productId: number) {
         const userId = localStorage.getItem("userId");
