@@ -6,6 +6,7 @@
     position: relative;
     z-index: 1;
 }
+
 .banner-div {
     width: 90%;
     height: 100%;
@@ -17,51 +18,62 @@
     gap: 35px;
     text-align: center;
 }
+
 .banner-div h4 {
     font-family: "Lora", serif;
     color: var(--main);
     font-weight: var(--fw-lg);
 }
+
 .banner-div h6 {
     font-family: "Dancing Script", cursive;
     color: var(--text-primary);
     font-weight: var(--fw-md);
 }
+
 .carousel-item .banner-mobile {
     display: block;
 }
+
 .carousel-item .banner-web {
     display: none;
 }
+
 /* Category */
 .category-main {
     background: #FAF1F8;
     padding: 40px 0px;
 }
+
 .category-div {
     width: 90%;
     margin: auto;
 }
+
 /* Product */
 .product-main {
     background: var(--secondary);
     padding: 40px 0px;
 }
+
 .product-div {
     width: 90%;
     margin: auto;
 }
+
 .product-tabs {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 8px;
 }
+
 /* Spotlight */
 .spotlight-main {
     background: var(--secondary);
     padding: 40px 0px;
 }
+
 .spotlight-div {
     width: 90%;
     margin: auto;
@@ -72,107 +84,125 @@
     border-radius: 10px;
     padding: 40px 0px;
 }
+
 .spotlight-skel {
     width: 100%;
     border-radius: 12px;
 }
-@media screen and (min-width: 767px) {
-    .spotlight-skel {
-        height: 420px;
-    }
-}
-@media screen and (max-width: 767px) {
-    .spotlight-skel {
-        height: 260px;
-    }
-}
+
 /* Collections */
 .collection-main {
     background: var(--secondary);
     padding: 40px 0px;
 }
+
 .collection-div {
     width: 90%;
     margin: auto;
 }
+
 /* Reels */
 .reel-main {
     background: var(--secondary);
     padding: 40px 0px;
 }
+
 .reel-div {
     width: 90%;
     margin: auto;
 }
+
 /* Testimonial */
 .testimonial-main {
     background: var(--secondary);
     padding: 40px 0px;
 }
+
 .testimonial-div {
     width: 90%;
     margin: auto;
 }
+
 /* Blogs */
 .blog-main {
     background: var(--secondary);
     padding: 40px 0px;
 }
+
 .blog-div {
     width: 90%;
     margin: auto;
 }
+
 .blog-img-skel {
     width: 100%;
     height: 220px;
     border-radius: 12px 12px 0 0;
 }
+
 @media screen and (min-width: 1098px) {
     .banner-div h4 {
         width: 70%;
         font-size: 45px;
     }
+
     .banner-div h6 {
         font-size: 30px;
     }
 }
+
 @media screen and (min-width: 767px) and (max-width: 1098px) {
     .banner-div h4 {
         width: 80%;
         font-size: 40px;
     }
+
     .banner-div h6 {
         font-size: 25px;
     }
 }
+
 @media screen and (max-width: 767px) {
     .banner-main {
-        height: 80vh;
+        height: 100vh;
     }
+
     .banner-div h4 {
         width: 100%;
         font-size: 30px;
     }
+
     .banner-div h6 {
         font-size: 20px;
     }
+
     .carousel-item .banner-mobile {
         display: none;
     }
+
     .carousel-item .banner-web {
         display: block;
     }
 }
+
 .banner-main {
-    margin-bottom: 40px;
+    /* margin-bottom: 40px; */
+
+    .carousel-item {
+        height: 100%;
+    }
+
     img {
         width: 100%;
+        height: 100%;
         border-radius: 12px;
         object-fit: cover;
     }
 }
+
 .banner-main .carousel-indicators {
     margin-bottom: 15px;
+
     button {
         width: 10px;
         height: 10px;
@@ -181,60 +211,31 @@
         background-color: rgba(255, 255, 255, 0.6);
         border: none;
     }
+
     .active {
         background-color: #fff;
         transform: scale(1.2);
     }
 }
+
 /* Hide arrows */
 .banner-main .carousel-control-prev,
 .banner-main .carousel-control-next {
     display: none;
 }
+
 .banner-clickable {
     cursor: pointer;
 }
 
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 350px);
-    gap: 2px;
-    margin-top: 25px;
-    align-items: center;
-    justify-content: center;
-}
-
-.stats-card {
-    background: linear-gradient(180deg, #E9047C 0%, #44122C 100%);
-    width: 320px;
-    height: 160px;
-    border-radius: 12px;
-    padding: 32px 20px;
-    text-align: center;
-    color: #fff;
-}
-
-.stats-value {
-    font-size: 32px;
-    font-weight: 700;
-    margin: 0 0 8px 0;
-    color: #f5c344;
-}
-
-.stats-label {
-    font-size: 16px;
-    margin: 0;
-    opacity: 0.95;
-}
-
-@media screen and (max-width: 991px) {
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
+@media screen and (min-width: 767px) {
+    .spotlight-skel {
+        height: 420px;
     }
 }
 
-@media screen and (max-width: 480px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
+@media screen and (max-width: 767px) {
+    .spotlight-skel {
+        height: 260px;
     }
 }

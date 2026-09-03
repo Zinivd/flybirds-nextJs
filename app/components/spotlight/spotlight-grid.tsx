@@ -17,7 +17,7 @@ export default function SpotlightGrid({ spotlights }: { spotlights: SpotlightIte
         .slice(0, 2);
 
     return (
-        <>
+        <div className="spotlight-main">
             <div className="spotlight-grid">
                 {items.map((item) => (
                     <Spotlight key={item.id} spotlight={item} />
@@ -32,6 +32,6 @@ export default function SpotlightGrid({ spotlights }: { spotlights: SpotlightIte
                     </div>
                 ))}
             </div>
-        </>
+        </div>
     );
 }

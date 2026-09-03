@@ -9,10 +9,10 @@ export default function Category({ category }: { category: CategoryItem }) {
         <Link href={`/all-products?categoryName=${encodeURIComponent(category.name)}&categoryId=${category.id}`}>
             <div className="category-box mb-4">
                 <img
-    src={category.banner_url ?? "/assets/images/no-image.png"}
-    alt={category.name}
-    className="mb-2"
-/>
+                    src={category.banner_url ?? "/assets/images/no-image.png"}
+                    alt={category.name}
+                    className="mb-2"
+                />
                 <h6 className="mb-0">{category.name}</h6>
             </div>
         </Link>

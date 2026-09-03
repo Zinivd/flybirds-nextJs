@@ -160,21 +160,21 @@ export default function Orders() {
         setTracking({ loading: false, error: null, shipmentStatus: null, isNotShipped: false });
     }
 
-   const detailItems = (selectedOrder?.items || []).map((i: any) => {
-    const galleryImages =
-        i.product_color_variant?.gallery_images?.map((g: any) => g.image_url) ??
-        i.product_details?.color?.gallery_images ??
-        [];
+    const detailItems = (selectedOrder?.items || []).map((i: any) => {
+        const galleryImages =
+            i.product_color_variant?.gallery_images?.map((g: any) => g.image_url) ??
+            i.product_details?.color?.gallery_images ??
+            [];
 
-    return {
-        name: i.product_name ?? "",
-        color: i.color ?? "",
-        size: i.size ?? "",
-        qty: i.quantity ?? 1,
-        total: Number(i.total ?? 0),
-        image: galleryImages[0] ?? "/assets/images/no-image.png",
-    };
-});
+        return {
+            name: i.product_name ?? "",
+            color: i.color ?? "",
+            size: i.size ?? "",
+            qty: i.quantity ?? 1,
+            total: Number(i.total ?? 0),
+            image: galleryImages[0] ?? "/assets/images/no-image.png",
+        };
+    });
 
     const detailSubtotal = Number(selectedOrder?.subtotal ?? 0);
     const detailDiscount = Number(selectedOrder?.discount ?? 0);

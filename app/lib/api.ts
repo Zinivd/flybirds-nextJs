@@ -1,6 +1,6 @@
 // export const API_URL = "http://127.0.0.1:8000/api";
-export const API_URL = "https://api-prod.flybirdsleggings.com/api";
-// export const API_URL = "https://backend-dev.flybirdsleggings.com/api";
+// export const API_URL = "https://api-prod.flybirdsleggings.com/api";
+export const API_URL = "https://backend-dev.flybirdsleggings.com/api";
 
 // ---------- Delhivery Tracking (customer-facing) ----------
 interface TrackOrderResponse {
@@ -451,10 +451,13 @@ export async function sentMail<T>(orderId: string | number): Promise<T> {
 }
 
 export async function checkPincodeAvailability<T>(pincode: string): Promise<T> {
-  const res = await fetch(`${API_URL}/user/delhivery/serviceability/${pincode}`, {
-    method: "GET",
-    headers: getHeaders(),
-  });
+  const res = await fetch(
+    `${API_URL}/user/delhivery/serviceability/${pincode}`,
+    {
+      method: "GET",
+      headers: getHeaders(),
+    },
+  );
   const data = await res.json();
   if (!res.ok) throw { error: data };
   return data;
@@ -520,8 +523,6 @@ export async function confirmCodOrder<T>(orderId: string | number): Promise<T> {
   return data;
 }
 
-
-
 export async function trackOrder<T = TrackOrderResponse>(
   orderId: string,
   userId: string,
@@ -535,21 +536,20 @@ export async function trackOrder<T = TrackOrderResponse>(
   return data;
 }
 
-
 export async function getSpotlights<T>(): Promise<T> {
   const res = await fetch(`${API_URL}/spotlights`, { headers: getHeaders() });
   if (!res.ok) throw new Error("Get Spotlights API error");
   return res.json();
 }
- 
-// ---------- Blogs ----------
+
+// Blogs
 // GET /blogs -> { status, message, data: { data: BlogItem[], ... (paginated) } }
 export async function getBlogs<T>(): Promise<T> {
   const res = await fetch(`${API_URL}/blogs`, { headers: getHeaders() });
   if (!res.ok) throw new Error("Get Blogs API error");
   return res.json();
 }
- 
+
 // GET /blogs/{id} -> { status, message, data: BlogItem }
 export async function getBlogById<T>(id: number | string): Promise<T> {
   const res = await fetch(`${API_URL}/blogs/${id}`, { headers: getHeaders() });
@@ -557,4 +557,16 @@ export async function getBlogById<T>(id: number | string): Promise<T> {
   if (!res.ok) throw { error: data };
   return data;
 }
- 
+
+// GET wishlist and cart count
+export async function getCartWishlistSummary<T>(userId: string): Promise<T> {
+  const res = await fetch(
+    `${API_URL}/admin/users/${userId}/cart-wishlist-summary`,
+    {
+      headers: getHeaders(),
+    },
+  );
+  const data = await res.json();
+  if (!res.ok) throw { error: data };
+  return data;
+}

@@ -535,7 +535,7 @@ export default function Cart() {
                                         </button>
                                     </div>
                                 </div>
-                                <h6 className="mt-1 mb-0 fw-semibold text-end">₹{formatMoney(itemTotal(item))}</h6>
+                                <h6 className="mt-2 mb-0 fw-semibold text-end">₹{formatMoney(itemTotal(item))}</h6>
                             </div>
                         ))}
                     </div>

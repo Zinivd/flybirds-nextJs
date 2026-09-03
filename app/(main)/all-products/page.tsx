@@ -225,7 +225,7 @@ function AllProductsInner() {
 
     return (
         <div className="filter-products-main">
-            <div className="body-head d-flex justify-content-between align-items-center flex-wrap mb-2">
+            <div className="body-head d-flex justify-content-between align-items-center flex-wrap row-gap-3 mb-2">
                 <h6 className="d-flex align-items-center column-gap-2 mb-0">
                     <Link href="/">Home
                         <i className="fas fa-chevron-right ps-1"></i>
@@ -241,7 +241,7 @@ function AllProductsInner() {
                         <a className="active">All Products</a>
                     )}
                 </h6>
-                <h4>{categoryNameDisplay || "All Products"}</h4>
+                <h4 className="mb-0">{categoryNameDisplay || "All Products"}</h4>
                 <div className="form select-div mb-3">
                     <label htmlFor="sort" className="me-2">Sort By : </label>
                     <select
@@ -254,8 +254,8 @@ function AllProductsInner() {
                         ))}
                     </select>
                 </div>
-                <button className="btn filter-responsive" data-bs-toggle="offcanvas" data-bs-target="#filter-offcanvas">
-                    <i className="fas fa-sliders-h"></i> Filter
+                <button className="filter-responsive" data-bs-toggle="offcanvas" data-bs-target="#filter-offcanvas">
+                    <i className="fas fa-sliders-h pe-1"></i> Filter
                 </button>
             </div>
             <div className="filter-product-flex">
@@ -276,7 +276,7 @@ function AllProductsInner() {
                         >
                             <div className="offcanvas-header">
                                 <img src="/assets/images/Logo-Dark.png" height={40} alt="" />
-                                <button type="button" className="btn-close bg-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                                <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                             </div>
                             <div className="offcanvas-body p-0">
                                 <div className="flex-shrink-0 filter-sidebar">

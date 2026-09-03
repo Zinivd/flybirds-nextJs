@@ -38,16 +38,16 @@
 .stats-card {
     background: linear-gradient(135deg, #9c1f5c, #6a1145);
     border-radius: 12px;
-    padding: 32px 20px;
+    padding: 20px;
     text-align: center;
-    color: #fff;
+    color: var(--secondary);
 }
 
 .stats-value {
     font-size: 32px;
     font-weight: 700;
     margin: 0 0 8px 0;
-    color: #f5c344;
+    color: var(--yellow);
 }
 
 .stats-label {
@@ -61,6 +61,7 @@
     .spotlight-grid {
         grid-template-columns: repeat(2, minmax(280px, 1fr));
     }
+
     .spotlight-box {
         width: 100%;
         height: 286px;
@@ -77,6 +78,7 @@
     .spotlight-grid {
         grid-template-columns: 1fr;
     }
+
     .spotlight-box {
         height: 260px;
     }

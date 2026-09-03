@@ -307,7 +307,7 @@
     }
 }
 
-.profile-nav-pill {
+.portal-main .profile-nav-pill {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -315,7 +315,7 @@
     border: 2px solid var(--border) !important;
 }
 
-.pill-btn {
+.portal-main .pill-btn {
     background: var(--secondary);
     color: var(--text-primary);
     border: 2px solid var(--border);
@@ -325,16 +325,16 @@
     transition: all var(--transition);
 }
 
-.pill-btn-left {
+.portal-main .pill-btn-left {
     border-radius: 20px 0px 0px 20px !important;
 }
 
-.pill-btn-right {
+.portal-main .pill-btn-right {
     border-radius: 0px 20px 20px 0px !important;
 }
 
-.pill-btn:hover,
-.pill-btn.active {
+.portal-main .pill-btn:hover,
+.portal-main .pill-btn.active {
     background: linear-gradient(270deg, #E9047C 0%, #44122C 100%);
     color: var(--secondary) !important;
     border: 2px solid transparent;

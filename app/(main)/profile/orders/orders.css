@@ -35,34 +35,34 @@
     border-radius: 5px;
 }
 
-.product-cell {
+.summary-item .product-cell {
     display: flex;
     align-items: center;
     column-gap: 10px;
 }
 
-.product-cell img {
+.summary-item .product-cell img {
     border-radius: 5px;
     border: 1px solid var(--border);
     object-fit: cover;
 }
 
-.product-cell h5 {
+.summary-item .product-cell h5 {
     color: var(--text-primary);
     font-weight: var(--fw-lg);
 }
 
-.product-cell h6 {
+.summary-item .product-cell h6 {
     color: var(--text-secondary);
     font-weight: var(--fw-md);
 }
 
-.product-cell a {
+.summary-item .product-cell a {
     color: var(--text-secondary);
     font-weight: var(--fw-md);
 }
 
-.product-cell a:hover {
+.summary-item .product-cell a:hover {
     color: var(--main);
 }
 
@@ -101,17 +101,17 @@
         padding: 15px;
     }
 
-    .product-cell img {
+    .summary-item .product-cell img {
         height: 80px;
         width: 80px;
     }
 
-    .product-cell h5 {
+    .summary-item .product-cell h5 {
         font-size: 16px;
     }
 
-    .product-cell h6,
-    .product-cell a {
+    .summary-item .product-cell h6,
+    .summary-item .product-cell a {
         font-size: 12px !important;
     }
 
@@ -132,17 +132,17 @@
         padding: 10px;
     }
 
-    .product-cell img {
+    .summary-item .product-cell img {
         height: 70px;
         width: 70px;
     }
 
-    .product-cell h5 {
+    .summary-item .product-cell h5 {
         font-size: 14px;
     }
 
-    .product-cell h6,
-    .product-cell a {
+    .summary-item .product-cell h6,
+    .summary-item .product-cell a {
         font-size: 10px !important;
     }
 
@@ -164,17 +164,17 @@
         padding: 0px;
     }
 
-    .product-cell img {
+    .summary-item .product-cell img {
         height: 80px;
         width: 80px;
     }
 
-    .product-cell h5 {
+    .summary-item .product-cell h5 {
         font-size: 14px;
     }
 
-    .product-cell h6,
-    .product-cell a {
+    .summary-item .product-cell h6,
+    .summary-item .product-cell a {
         font-size: 10px;
     }
 
@@ -208,6 +208,7 @@
 .tracking-card {
     border-left: 3px solid var(--main, #E9047C);
 }
+
 .track-refresh-btn {
     background: transparent;
     border: 1px solid var(--border);
@@ -219,30 +220,37 @@
     transition: all var(--transition);
     cursor: pointer;
 }
+
 .track-refresh-btn:hover:not(:disabled) {
     background: var(--main, #E9047C);
     color: #fff;
     border-color: var(--main, #E9047C);
 }
+
 .track-refresh-btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
 }
+
 .tracking-status-row {
     display: flex;
     align-items: center;
     gap: 10px;
     padding: 10px 0 2px;
 }
+
 .tracking-status-row i {
     font-size: 14px;
 }
+
 .tracking-ok i {
     color: #16a34a;
 }
+
 .tracking-error i {
     color: #dc2626;
 }
+
 .dot-loading {
     width: 8px;
     height: 8px;
@@ -250,7 +258,17 @@
     background: var(--main, #E9047C);
     animation: pulse-dot 1s ease-in-out infinite;
 }
+
 @keyframes pulse-dot {
-    0%, 100% { opacity: 0.3; transform: scale(0.8); }
-    50% { opacity: 1; transform: scale(1.1); }
+
+    0%,
+    100% {
+        opacity: 0.3;
+        transform: scale(0.8);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.1);
+    }
 }

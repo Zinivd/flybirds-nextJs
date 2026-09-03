@@ -1,27 +1,33 @@
 .flex-sidebar::-webkit-scrollbar {
     display: none;
 }
+
 .filter-sidebar .btnname {
     width: 100%;
     font-size: 12px;
     font-weight: var(--fw-sm);
     text-align: left;
 }
+
 .filter-sidebar .form-control {
     font-size: 12px;
     color: var(--text-primary);
 }
+
 .filter-sidebar .form-control:focus {
     border: 1px solid var(--sub);
     outline: none;
     box-shadow: none;
 }
+
 .filter-sidebar li {
     padding: 5px 15px 0px 15px;
 }
+
 .offcanvas-filter {
     background-color: var(--secondary) !important;
 }
+
 .flex-sidebar {
     height: 100%;
     background: var(--light-bg);
@@ -32,6 +38,7 @@
     border-radius: 5px;
     overflow-y: scroll;
 }
+
 .sizes,
 .colors {
     display: grid;
@@ -39,6 +46,7 @@
     align-items: center;
     justify-content: space-between;
 }
+
 .color-box {
     width: 30px;
     height: 30px;
@@ -47,32 +55,39 @@
     position: relative;
     transition: transform 0.2s ease;
 }
+
 .color-label {
     font-size: 10px;
     font-weight: var(--fw-md);
     color: var(--text-primary);
 }
+
 .color-box:hover {
     transform: scale(1.1);
 }
+
 .color-box.selected,
 .color-box.active {
     outline: 2px solid var(--main);
     transform: scale(1.1);
 }
+
 .filter-header .collapse:last-of-type hr:last-of-type {
     display: none !important;
 }
+
 @media screen and (min-width: 1098px) {
     .flex-sidebar {
         top: 15vh;
     }
 }
+
 @media screen and (min-width: 767px) and (max-width: 1098px) {
     .flex-sidebar {
         top: 13vh;
     }
 }
+
 @media screen and (max-width: 767px) {
     .flex-sidebar {
         display: none;
@@ -83,27 +98,33 @@
 .flex-sidebar::-webkit-scrollbar {
     display: none;
 }
+
 .filter-sidebar .btnname {
     width: 100%;
     font-size: 12px;
     font-weight: var(--fw-sm);
     text-align: left;
 }
+
 .filter-sidebar .form-control {
     font-size: 12px;
     color: var(--text-primary);
 }
+
 .filter-sidebar .form-control:focus {
     border: 1px solid var(--sub);
     outline: none;
     box-shadow: none;
 }
+
 .filter-sidebar li {
     padding: 5px 15px 0px 15px;
 }
+
 .offcanvas-filter {
     background-color: var(--secondary) !important;
 }
+
 .flex-sidebar {
     height: 100%;
     background: var(--light-bg);
@@ -114,19 +135,23 @@
     border-radius: 5px;
     overflow-y: scroll;
 }
+
 .filter-header .collapse:last-of-type hr:last-of-type {
     display: none !important;
 }
+
 @media screen and (min-width: 1098px) {
     .flex-sidebar {
         top: 15vh;
     }
 }
+
 @media screen and (min-width: 767px) and (max-width: 1098px) {
     .flex-sidebar {
         top: 13vh;
     }
 }
+
 @media screen and (max-width: 767px) {
     .flex-sidebar {
         display: none;

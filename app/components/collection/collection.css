@@ -22,8 +22,8 @@
 
 .collection-img {
     position: relative;
-    width: 292px;
-    height: 426px;
+    width: 100%;
+    height: 400px;
     border: 2px solid var(--border);
     border-radius: 8px;
     display: flex;
@@ -56,22 +56,22 @@
     align-items: center;
     gap: 8px;
     margin-top: 10px;
-    width: 292px;
+    width: 100%;
 }
 
 /* Pill label button (e.g. "Ankle", "Shimmer") */
 .add-cart-btn-2 {
     flex: 1;
-    padding: 12px 20px;
+    padding: 12px 15px;
     border-radius: 40px;
     border: 1px solid var(--border);
-    background: #fff;
-    font-size: 15px;
+    background: var(--secondary);
+    font-size: 14px;
     font-weight: var(--fw-md);
     text-align: left;
     cursor: pointer;
     transition: var(--transition);
-    color: #111;
+    color: var(--text-primary);
 }
 
 .add-cart-btn-2:hover {
@@ -101,11 +101,11 @@
 
 @media screen and (max-width: 767px) {
     .collection-grid {
-        grid-template-columns: repeat(2, 48%);
+        grid-template-columns: repeat(1, 100%);
     }
 
     .collection-img {
-        height: 300px;
+        height: 400px;
     }
 }
 

@@ -12,45 +12,45 @@ export default function Products({ product }: { product: ProductItem }) {
     const [addingToCart, setAddingToCart] = useState(false);
 
     async function handleAddToCart(e: React.MouseEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
-        toast.info("Please log in to add items to your bag.");
-        return;
-    }
-    if (addingToCart) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const userId = localStorage.getItem("userId");
+        if (!userId) {
+            toast.info("Please log in to add items to your bag.");
+            return;
+        }
+        if (addingToCart) return;
 
-    const firstVariant = product.color_variants?.[0];
-    if (!firstVariant) {
-        toast.info("This product isn't available to add right now.");
-        return;
-    }
+        const firstVariant = product.color_variants?.[0];
+        if (!firstVariant) {
+            toast.info("This product isn't available to add right now.");
+            return;
+        }
 
-    const firstSizeStock = firstVariant.size_stocks?.[0];
-    if (!firstSizeStock) {
-        // No sizes at all for this variant — send the user to pick manually
-        toast.info("Please select options for this product.");
-        return;
-    }
+        const firstSizeStock = firstVariant.size_stocks?.[0];
+        if (!firstSizeStock) {
+            // No sizes at all for this variant — send the user to pick manually
+            toast.info("Please select options for this product.");
+            return;
+        }
 
-    setAddingToCart(true);
-    try {
-        await addToCartApi(userId, {
-            product_id: product.id,
-            product_color_variant_id: firstVariant.id,
-            family_color_id: firstVariant.family_color_id,
-            family_color_child_id: firstVariant.family_color_child_id ?? null,
-            product_size_stock_id: firstSizeStock.id,
-            quantity: 1,
-        });
-        toast.success("Added to bag!");
-    } catch {
-        toast.error("Failed to add to bag.");
-    } finally {
-        setAddingToCart(false);
+        setAddingToCart(true);
+        try {
+            await addToCartApi(userId, {
+                product_id: product.id,
+                product_color_variant_id: firstVariant.id,
+                family_color_id: firstVariant.family_color_id,
+                family_color_child_id: firstVariant.family_color_child_id ?? null,
+                product_size_stock_id: firstSizeStock.id,
+                quantity: 1,
+            });
+            toast.success("Added to bag!");
+        } catch {
+            toast.error("Failed to add to bag.");
+        } finally {
+            setAddingToCart(false);
+        }
     }
-}
 
     const colorVariants = product.color_variants || [];
     const visibleSwatches = colorVariants.slice(0, 4);
@@ -70,10 +70,10 @@ export default function Products({ product }: { product: ProductItem }) {
 
     const subtitle = product.tags
         ? product.tags
-              .split(",")
-              .slice(0, 2)
-              .map((t) => t.trim())
-              .join(" | ")
+            .split(",")
+            .slice(0, 2)
+            .map((t) => t.trim())
+            .join(" | ")
         : product.brand || "";
 
     return (

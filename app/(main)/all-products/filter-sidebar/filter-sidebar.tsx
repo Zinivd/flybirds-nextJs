@@ -53,7 +53,7 @@ export default function FilterSidebar({
                     <h6 className="mb-0 text-dark text-uppercase filter-title">Filter By</h6>
                 </div>
             </li>
-            <hr className="border-0" />
+            {/* <hr className="border-0" /> */}
 
             {/* Category — always expanded, no collapse toggle. Shows every
                 category; whichever one(s) arrived via the URL stay checked. */}

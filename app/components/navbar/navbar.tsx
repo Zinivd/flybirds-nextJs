@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { getCategoryList, getProducts } from "@/app/lib/api";
+import { getCartWishlistSummary, getCategoryList, getProducts } from "@/app/lib/api";
 import { CategoryItem } from "@/app/types/shop.models";
 import "./navbar.css";
 
@@ -21,6 +21,14 @@ interface SearchProduct {
     image: string;
 }
 
+interface CartWishlistSummary {
+    status: string;
+    data: {
+        cart_count: number;
+        has_wishlist: boolean;
+    };
+}
+
 export default function Navbar() {
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -37,8 +45,28 @@ export default function Navbar() {
     const searchWrapRef = useRef<HTMLLIElement>(null);
     const mobileSearchWrapRef = useRef<HTMLDivElement>(null);
 
+    const [cartWishlistSummary, setCartWishlistSummary] = useState<CartWishlistSummary | null>(null);
+
     useEffect(() => {
         setIsLoggedIn(isAuthenticated());
+
+        const userId = localStorage.getItem("userId");
+        if (!userId) return; // not logged in — nothing to summarize yet
+
+        let cancelled = false;
+        (async () => {
+            try {
+                const res = await getCartWishlistSummary<any>(userId);
+                if (cancelled) return;
+                console.log("cart-wishlist-summary response:", res);
+                setCartWishlistSummary(res);
+            } catch (err) {
+                console.error("Navbar: error fetching cart-wishlist summary:", err);
+            }
+        })();
+        return () => {
+            cancelled = true;
+        };
     }, []);
 
     // Central auth check — used everywhere we need to gate a click.
@@ -207,9 +235,9 @@ export default function Navbar() {
         // Map display labels back to the CATEGORY_NAV_MAP keys used above.
         const labelKey =
             item.label === "Shimmer" ? "Shimmer legging" :
-            item.label === "Saree Shaper" ? "Saree Shaper" :
-            item.label === "Ankle" ? "Ankle legging" :
-            item.label;
+                item.label === "Saree Shaper" ? "Saree Shaper" :
+                    item.label === "Ankle" ? "Ankle legging" :
+                        item.label;
         const href = getCategoryHref(labelKey);
         const categoryId = getCategoryId(labelKey);
         // Categories haven't loaded yet, or no match was found — render a
@@ -248,8 +276,8 @@ export default function Navbar() {
                                 </Link>
                             </div>
                             <div className="icons-div d-lg-none align-items-center">
-                                
-                                   <a href="#"
+
+                                <a href="#"
                                     onClick={(e) => {
                                         e.preventDefault();
                                         setMobileSearchOpen((v) => !v);
@@ -261,15 +289,50 @@ export default function Navbar() {
                                     href={{ pathname: "/profile", query: { tab: 3 } }}
                                     className={`nav-link ${isActive("/profile") ? "active" : ""}`}
                                     onClick={(e) => guardedNavigate(e, "/profile?tab=3")}
+                                    style={{ position: "relative" }}
                                 >
                                     <i className="bx bx-heart"></i>
+                                    {cartWishlistSummary?.data?.has_wishlist && (
+                                        <span
+                                            style={{
+                                                position: "absolute",
+                                                top: 0,
+                                                right: 0,
+                                                width: 8,
+                                                height: 8,
+                                                borderRadius: "50%",
+                                                background: "var(--main)",
+                                            }}
+                                        />
+                                    )}
                                 </Link>
                                 <Link
                                     href="/cart"
                                     className={`nav-link ${isActive("/cart") ? "active" : ""}`}
                                     onClick={(e) => guardedNavigate(e, "/cart")}
+                                    style={{ position: "relative" }}
                                 >
                                     <i className="bx bx-shopping-bag"></i>
+                                    {!!cartWishlistSummary?.data?.cart_count && (
+                                        <span
+                                            style={{
+                                                position: "absolute",
+                                                top: -4,
+                                                right: -6,
+                                                minWidth: 15,
+                                                height: 15,
+                                                padding: "0 3px",
+                                                borderRadius: "50%",
+                                                background: "var(--main)",
+                                                color: "var(--secondary)",
+                                                fontSize: 10,
+                                                lineHeight: "15px",
+                                                textAlign: "center",
+                                            }}
+                                        >
+                                            {cartWishlistSummary.data.cart_count}
+                                        </span>
+                                    )}
                                 </Link>
                                 <Link
                                     href="/profile"
@@ -434,8 +497,22 @@ export default function Navbar() {
                                     className={`nav-link nav-icon-btn ${isActive("/profile") ? "active" : ""}`}
                                     title="Wishlist"
                                     onClick={(e) => guardedNavigate(e, "/profile?tab=3")}
+                                    style={{ position: "relative" }}
                                 >
                                     <i className="bx bx-heart"></i>
+                                    {cartWishlistSummary?.data?.has_wishlist && (
+                                        <span
+                                            style={{
+                                                position: "absolute",
+                                                top: 1,
+                                                right: 1,
+                                                width: 8,
+                                                height: 8,
+                                                borderRadius: "50%",
+                                                background: "var(--main)",
+                                            }}
+                                        />
+                                    )}
                                 </Link>
                             </li>
                             <li className="nav-item">
@@ -444,8 +521,29 @@ export default function Navbar() {
                                     className={`nav-link nav-icon-btn ${isActive("/cart") ? "active" : ""}`}
                                     title="Cart"
                                     onClick={(e) => guardedNavigate(e, "/cart")}
+                                    style={{ position: "relative" }}
                                 >
                                     <i className="bx bx-shopping-bag"></i>
+                                    {!!cartWishlistSummary?.data?.cart_count && (
+                                        <span
+                                            style={{
+                                                position: "absolute",
+                                                top: -4,
+                                                right: -3,
+                                                minWidth: 15,
+                                                height: 15,
+                                                padding: "0 3px",
+                                                borderRadius: "50%",
+                                                background: "var(--main)",
+                                                color: "var(--secondary)",
+                                                fontSize: 10,
+                                                lineHeight: "15px",
+                                                textAlign: "center",
+                                            }}
+                                        >
+                                            {cartWishlistSummary.data.cart_count}
+                                        </span>
+                                    )}
                                 </Link>
                             </li>
                             <li className="nav-item">

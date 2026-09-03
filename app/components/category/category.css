@@ -1,12 +1,12 @@
 .category-box {
-    width: 200px;
+    width: 100%;
     margin: auto;
 }
 
 .category-box img {
     width: 100%;
     object-fit: cover;
-    border-radius: 10px;
+    border-radius: 5px;
     transition: all var(--transition);
 }
 
@@ -29,29 +29,29 @@
 
 @media screen and (min-width: 1098px) {
     .category-box img {
-        height: 276px;
+        height: 350px;
     }
 
     .category-box h6 {
-        font-size: 16px;
+        font-size: 17px;
     }
 
     .category-grid {
-        grid-template-columns: repeat(6, 15%);
+        grid-template-columns: repeat(5, 19%);
     }
 }
 
 @media screen and (min-width: 767px) and (max-width: 1098px) {
     .category-box img {
-        height: 275px;
+        height: 250px;
     }
 
     .category-box h6 {
-        font-size: 14px;
+        font-size: 15px;
     }
 
     .category-grid {
-        grid-template-columns: repeat(5, 15%);
+        grid-template-columns: repeat(5, 18%);
     }
 }
 

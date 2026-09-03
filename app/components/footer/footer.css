@@ -153,6 +153,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
 .footer-copyrights h6 {
@@ -382,21 +384,21 @@
 
 }
 
-
-.text-white1{
-    color: #E96256 !important; 
+.text-white1 {
+    color: #E96256 !important;
 }
-
 
 .shop-all-div ul li {
     list-style-type: none;
 }
+
 .shop-all-div ul li.shop-all-item {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     margin-bottom: 4px;
 }
+
 .shop-all-div ul li .nav-link {
     display: inline-block;
     color: var(--secondary) !important;
@@ -405,9 +407,11 @@
     transition: var(--transition);
     padding-left: 0px !important;
 }
+
 .shop-all-div ul li .nav-link:hover {
     color: var(--main) !important;
 }
+
 .shop-all-div ul li .separator {
     color: var(--secondary);
     opacity: 0.5;
