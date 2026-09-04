@@ -164,7 +164,7 @@
 
 @media screen and (max-width: 767px) {
     .banner-main {
-        height: 100vh;
+        height: fit-content;
     }
 
     .banner-div h4 {

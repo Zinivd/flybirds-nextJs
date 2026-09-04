@@ -90,25 +90,25 @@ export interface BannerCategory {
 // ─────────────────────────────────────────────
 export interface ProductItem {
   id: number;
-  name: string;                 // API field (was "title")
+  name: string; // API field (was "title")
   brand: string;
   unit: string;
   weight: string;
   min_qty: number;
   tags: string;
   description: string;
-  spotlight_image: string;      // API field (was "image")
+  spotlight_image: string; // API field (was "image")
   seo_title?: string;
   seo_description?: string;
   seo_keywords?: string[];
   category_id: number;
   category?: Category;
-  unit_price: string;           // MRP, sent as string e.g. "299.00"
+  unit_price: string; // MRP, sent as string e.g. "299.00"
   discount: string;
   discount_type: "flat" | "percentage";
   discount_start_date?: string;
   discount_end_date?: string;
-  effective_price: number;      // sale/discounted price (was "sp")
+  effective_price: number; // sale/discounted price (was "sp")
   reward_points: number;
   is_flash_sale: boolean;
   flash_sale_title?: string | null;
@@ -136,9 +136,13 @@ export interface ProductItem {
 // ─────────────────────────────────────────────
 export interface CollectionItem {
   id: number;
-  name: string;
+  name?: string;
   img: string;
-  slug: string;
+  slug?: string;
+  category?: {
+    id: number;
+    name: string;k
+  };
 }
 
 export interface ReelItem {
@@ -166,42 +170,41 @@ export interface Banner {
 // ProductItem, CollectionItem, ReelItem, Banner interfaces)
 
 export interface SpotlightItem {
+  id: number;
+  title: string;
+  product_id: number;
+  image: string;
+  image_url: string;
+  is_published: boolean;
+  is_active: boolean;
+  sort_order: number;
+  created_at?: string;
+  updated_at?: string;
+  product: {
     id: number;
-    title: string;
-    product_id: number;
-    image: string;
-    image_url: string;
-    is_published: boolean;
-    is_active: boolean;
-    sort_order: number;
-    created_at?: string;
-    updated_at?: string;
-    product: {
-        id: number;
-        name: string;
-        unit_price: string;
-        effective_price: number;
-    };
+    name: string;
+    unit_price: string;
+    effective_price: number;
+  };
 }
 
 export interface BlogItem {
+  id: number;
+  title: string;
+  sub_title: string;
+  description_1: string;
+  description_2: string;
+  description_3: string;
+  cover_image_path: string;
+  cover_image_url: string;
+  product_id: number;
+  is_published: boolean;
+  published_at: string;
+  created_at?: string;
+  updated_at?: string;
+  product?: {
     id: number;
-    title: string;
-    sub_title: string;
-    description_1: string;
-    description_2: string;
-    description_3: string;
-    cover_image_path: string;
-    cover_image_url: string;
-    product_id: number;
-    is_published: boolean;
-    published_at: string;
-    created_at?: string;
-    updated_at?: string;
-    product?: {
-        id: number;
-        name: string;
-        [key: string]: any;
-    };
+    name: string;
+    [key: string]: any;
+  };
 }
-

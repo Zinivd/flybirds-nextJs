@@ -6,11 +6,13 @@ import { getCartWishlistSummary, getCategoryList, getProducts } from "@/app/lib/
 import { CategoryItem } from "@/app/types/shop.models";
 import "./navbar.css";
 
-const CATEGORY_NAV_MAP: Record<string, string> = {
-    "Shimmer legging": "Shimmer legging",
-    "Saree Shaper": "Saree Shaper",
-    "Ankle legging": "Ankle legging",
-};
+// Static promo images shown in the mega menu — no category lookup,
+// no click-through, just the picture with its name above it.
+const MEGA_MENU_PROMOS: { image: string; name: string }[] = [
+    { image: "/assets/images/Explore/Ankle.png", name: "Ankle Leggings" },
+    { image: "/assets/images/Explore/Saree.png", name: "Saree Shaper" },
+    { image: "/assets/images/Explore/Shimmer.png", name: "Shimmer Leggings" },
+];
 
 interface SearchProduct {
     id: number;
@@ -46,6 +48,36 @@ export default function Navbar() {
     const mobileSearchWrapRef = useRef<HTMLDivElement>(null);
 
     const [cartWishlistSummary, setCartWishlistSummary] = useState<CartWishlistSummary | null>(null);
+
+    // ---------- Mega menu (opens when hovering/tapping "Woman") ----------
+    const [megaMenuOpen, setMegaMenuOpen] = useState(false);
+    const megaMenuCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    function openMegaMenu() {
+        if (megaMenuCloseTimer.current) {
+            clearTimeout(megaMenuCloseTimer.current);
+            megaMenuCloseTimer.current = null;
+        }
+        setMegaMenuOpen(true);
+    }
+
+    function scheduleCloseMegaMenu() {
+        // Small delay so moving the mouse from "Woman" down into the
+        // panel itself doesn't cause it to flicker shut.
+        megaMenuCloseTimer.current = setTimeout(() => setMegaMenuOpen(false), 150);
+    }
+
+    // Tap-to-toggle for touch devices, where there's no hover.
+    function toggleMegaMenu(e: React.MouseEvent) {
+        e.preventDefault();
+        setMegaMenuOpen((v) => !v);
+    }
+
+    useEffect(() => {
+        return () => {
+            if (megaMenuCloseTimer.current) clearTimeout(megaMenuCloseTimer.current);
+        };
+    }, []);
 
     useEffect(() => {
         setIsLoggedIn(isAuthenticated());
@@ -184,81 +216,135 @@ export default function Navbar() {
     const isActive = (href: string, exact = false) =>
         exact ? pathname === href : pathname.startsWith(href);
 
-    // A category link is active when we're on /all-products AND the
-    // categoryId in the URL matches this category's id.
-    const isCategoryActive = (categoryId: number) =>
-        pathname === "/all-products" && Number(searchParams.get("categoryId")) === categoryId;
+    // Builds the href for any category coming straight from the API list
+    // (used inside the mega menu, where every category is shown).
+    const getCategoryHrefById = (category: CategoryItem) =>
+        `/all-products?categoryName=${encodeURIComponent(category.name)}&categoryId=${category.id}`;
 
-    // Builds the query-string shape: /all-products?categoryName={name}&categoryId={id}
-    const getCategoryHref = (label: string): string | null => {
-        const targetName = CATEGORY_NAV_MAP[label];
-        if (!targetName) return null;
-        const match = categories.find(
-            (c) => c.name?.toLowerCase() === targetName.toLowerCase()
-        );
-        return match
-            ? `/all-products?categoryName=${encodeURIComponent(match.name)}&categoryId=${match.id}`
-            : null;
-    };
+    // ---------- Mega menu panel ----------
+    const renderMegaMenu = () => {
+        if (!megaMenuOpen) return null;
 
-    // Looks up the matching category's id, used for the active-state check.
-    const getCategoryId = (label: string): number | null => {
-        const targetName = CATEGORY_NAV_MAP[label];
-        if (!targetName) return null;
-        const match = categories.find(
-            (c) => c.name?.toLowerCase() === targetName.toLowerCase()
-        );
-        return match ? match.id : null;
-    };
-
-    const navLinks = [
-        { label: "Home", href: "/", exact: true },
-        { label: "Shimmer", href: null as string | null },
-        { label: "Saree Shaper", href: null as string | null },
-        { label: "Ankle", href: null as string | null },
-    ];
-
-    const renderNavItem = (item: (typeof navLinks)[number]) => {
-        // "Home" keeps its static href/exact match behavior.
-        if (item.exact) {
-            return (
-                <li className="nav-item" key={item.href}>
-                    <Link
-                        href={item.href!}
-                        className={`nav-link ${isActive(item.href!, item.exact) ? "active" : ""}`}
-                    >
-                        {item.label}
-                    </Link>
-                </li>
-            );
-        }
-        // Map display labels back to the CATEGORY_NAV_MAP keys used above.
-        const labelKey =
-            item.label === "Shimmer" ? "Shimmer legging" :
-                item.label === "Saree Shaper" ? "Saree Shaper" :
-                    item.label === "Ankle" ? "Ankle legging" :
-                        item.label;
-        const href = getCategoryHref(labelKey);
-        const categoryId = getCategoryId(labelKey);
-        // Categories haven't loaded yet, or no match was found — render a
-        // disabled placeholder instead of a broken/guessed link.
-        if (!href || categoryId === null) {
-            return (
-                <li className="nav-item" key={item.label}>
-                    <span className="nav-link disabled" aria-disabled="true">
-                        {item.label}
-                    </span>
-                </li>
-            );
-        }
         return (
-            <li className="nav-item" key={item.label}>
-                <Link href={href} className={`nav-link ${isCategoryActive(categoryId) ? "active" : ""}`}>
-                    {item.label}
+            <div
+                onMouseEnter={openMegaMenu}
+                onMouseLeave={scheduleCloseMegaMenu}
+                style={{
+                    position: "absolute",
+                    top: "100%",
+                    left: 0,
+                    width: "750px",
+                    maxWidth: "95vw",
+                    background: "#fff",
+                    border: "1px solid var(--border, #e5e5e5)",
+                    borderRadius: "10px",
+                    boxShadow: "0 12px 32px rgba(0,0,0,0.15)",
+                    padding: "20px 25px",
+                    zIndex: 100,
+                    display: "flex",
+                    gap: "32px",
+                }}
+            >
+                {/* Left: all categories from the API, in a scannable multi-column list */}
+                <div style={{ flex: "1 1 45%" }}>
+                    <h6 style={{ marginBottom: 16, fontWeight: 700 }}>Shop by Category</h6>
+                    {categories.length === 0 ? (
+                        <p style={{ fontSize: 14, color: "#888" }}>Loading categories…</p>
+                    ) : (
+                        <ul
+                            style={{
+                                listStyle: "none",
+                                margin: 0,
+                                padding: 0,
+                                columnCount: 2,
+                                columnGap: "20px",
+                            }}
+                        >
+                            {categories.map((cat) => (
+                                <li key={cat.id} style={{ breakInside: "avoid", marginBottom: 12 }}>
+                                    <Link
+                                        href={getCategoryHrefById(cat)}
+                                        onClick={() => setMegaMenuOpen(false)}
+                                        style={{
+                                            display: "block",
+                                            fontSize: 14,
+                                            color: "#333",
+                                            textDecoration: "none",
+                                        }}
+                                    >
+                                        {cat.name}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+
+                {/* Right: the 3 promo cards, image sourced from the category's cover_url */}
+                <div style={{ flex: "1 1 55%" }}>
+                    <img src="/assets/images/Logo-Dark.png" height={35} alt="Logo"className="d-flex mx-auto mb-2" />
+                    <h6 style={{ marginBottom: 16, fontWeight: 700, textAlign: "center" }}>
+                        Our Special Offers
+                    </h6>
+                    <div style={{ display: "flex", gap: "10px" }}>
+                        {MEGA_MENU_PROMOS.map((promo) => (
+                            <div
+                                key={promo.name}
+                                style={{
+                                    flex: 1,
+                                    position: "relative",
+                                    display: "block",
+                                    borderRadius: "8px",
+                                    overflow: "hidden",
+                                    aspectRatio: "1 / 2",
+                                    backgroundImage: `url(${promo.image})`,
+                                    backgroundSize: "cover",
+                                    backgroundPosition: "top",
+                                    backgroundRepeat: "no-repeat",
+                                }}
+                            ></div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    // The 3 nav items, rendered identically for the desktop and mobile lists.
+    const renderNavLinks = () => (
+        <>
+            <li className="nav-item">
+                <Link href="/" className={`nav-link ${isActive("/", true) ? "active" : ""}`}>
+                    Home
                 </Link>
             </li>
-        );
-    };
+
+            <li
+                className="nav-item"
+                style={{ position: "relative" }}
+                onMouseEnter={openMegaMenu}
+                onMouseLeave={scheduleCloseMegaMenu}
+            >
+                <a
+                    href="#"
+                    className={`nav-link ${megaMenuOpen ? "active" : ""}`}
+                    onClick={toggleMegaMenu}
+                >
+                    Woman
+                </a>
+                {renderMegaMenu()}
+            </li>
+
+            <li className="nav-item">
+                <Link
+                    href="/all-products"
+                    className={`nav-link ${isActive("/all-products") ? "active" : ""}`}
+                >
+                    All Products
+                </Link>
+            </li>
+        </>
+    );
 
     return (
         <>
@@ -410,7 +496,7 @@ export default function Navbar() {
                             </div>
                         )}
                         <ul className="navbar-nav flex-row align-items-center justify-content-between mt-3 response-nav-content">
-                            {navLinks.map(renderNavItem)}
+                            {renderNavLinks()}
                         </ul>
                     </div>
                     {/* Web Navbar */}
@@ -420,9 +506,11 @@ export default function Navbar() {
                                 <img src="/assets/images/Logo-Dark.png" height={55} alt="Logo" />
                             </Link>
                         </div>
-                        <ul className="navbar-nav col-lg-5 align-items-lg-center justify-content-lg-evenly navbarNav">
-                            {navLinks.map(renderNavItem)}
-                        </ul>
+                        <div className="col-lg-5">
+                            <ul className="navbar-nav align-items-lg-center justify-content-lg-evenly navbarNav">
+                                {renderNavLinks()}
+                            </ul>
+                        </div>
                         <ul className="navbar-nav col-lg-3 mb-0">
                             <li className="search-bar" ref={searchWrapRef} style={{ position: "relative" }}>
                                 <i className="bx bx-search text-center"></i>

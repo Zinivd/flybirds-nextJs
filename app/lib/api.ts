@@ -1,6 +1,6 @@
 // export const API_URL = "http://127.0.0.1:8000/api";
-// export const API_URL = "https://api-prod.flybirdsleggings.com/api";
-export const API_URL = "https://backend-dev.flybirdsleggings.com/api";
+export const API_URL = "https://api-prod.flybirdsleggings.com/api";
+// export const API_URL = "https://backend-dev.flybirdsleggings.com/api";
 
 // ---------- Delhivery Tracking (customer-facing) ----------
 interface TrackOrderResponse {

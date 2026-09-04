@@ -101,9 +101,13 @@ function mapProduct(row: any): ProductItem {
 function mapCollection(row: any): CollectionItem {
     return {
         id: row.id,
-        name: row.name,
-        img: row.cover_url || row.banner_url || row.icon_url || "/assets/images/no-image.png",
-        slug: slugify(row.name),
+        name: row.name, // fallback only, not primary display
+        category: row.category,
+        img:
+            row.color_variant?.gallery_images?.[0]?.image_url ??
+            row.spotlight_image ??
+            "/assets/images/no-image.png",
+        slug: slugify(row.category?.name ?? row.name),
     };
 }
 

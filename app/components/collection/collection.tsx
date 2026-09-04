@@ -5,15 +5,17 @@ import { CollectionItem } from "@/app/types/shop.models";
 import "./collection.css"
 
 export default function Collection({ collection }: { collection: CollectionItem }) {
-    const href = `/all-products?categoryName=${encodeURIComponent(collection.name)}&categoryId=${collection.id}`;
+    const categoryName = collection.category?.name ?? collection.name;
+    const href = `/product-details?id=${collection.id}`;
+
     return (
         <div className="collection-box">
             <div className="collection-img">
-                <img src={collection.img} alt={collection.name} />
+                <img src={collection.img} alt={categoryName} />
             </div>
             <div className="collection-box-content">
                 <Link href={href} className="add-cart-btn-2">
-                    {collection.name}
+                    {categoryName}
                 </Link>
                 <Link href={href} className="collection-btn">
                     <div className="collection-sign">
