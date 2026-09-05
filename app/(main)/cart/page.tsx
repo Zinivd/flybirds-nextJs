@@ -9,7 +9,6 @@ import { getCart, updateCartItem, removeCartItem, getRecentlyViewed } from "@/ap
 import { setOrderSummary } from "@/app/lib/checkout-store";
 import { ProductItem } from "@/app/types/shop.models";
 import "./page.css";
-
 export interface CartItem {
     id: number;
     productId: number;
@@ -29,12 +28,10 @@ export interface CartItem {
     colorName: string;
     colorCode: string;
 }
-
 const TAX_RATE = 0.18;
 const DEFAULT_MAX_QTY = 10;
 const SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 const COUPONS: Record<string, number> = { SAVE10: 10, SAVE20: 20, FLAT50: 50 };
-
 function round2(value: number): number {
     return Math.round((value + Number.EPSILON) * 100) / 100;
 }
@@ -80,7 +77,6 @@ function mapRecentlyViewed(row: any): ProductItem {
         color_variants: product.color_variants || [],
     };
 }
-
 export default function Cart() {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
@@ -90,16 +86,13 @@ export default function Cart() {
     const [couponCode, setCouponCode] = useState("");
     const [appliedCoupon, setAppliedCoupon] = useState("");
     const [couponError, setCouponError] = useState("");
-
     function userId() {
         return typeof window !== "undefined" ? localStorage.getItem("userId") : null;
     }
-
     useEffect(() => {
         loadCart();
         loadRecentlyViewed();
     }, []);
-
     async function loadCart() {
         const uid = userId();
         if (!uid) {
@@ -113,7 +106,9 @@ export default function Cart() {
             const mapped: CartItem[] = items.map((row: any) => {
                 const variant = row.color_variant;
                 const sortedImages = variant?.gallery_images?.slice().sort((a: any, b: any) => a.sort_order - b.sort_order);
-                const mrp = round2(Number(row.product?.unit_price ?? 0));
+                // Use the size-specific price (row.size_stock.price) as the base MRP,
+                // falling back to the product's unit_price only if no size_stock is present.
+                const mrp = round2(Number(row.size_stock?.price ?? row.product?.unit_price ?? 0));
                 const discountType = (row.product?.discount_type as "flat" | "percent" | null) ?? null;
                 const discountValue = Number(row.product?.discount ?? 0);
                 const price = calcDiscountedPrice(mrp, discountType, discountValue);
@@ -144,7 +139,6 @@ export default function Cart() {
             setLoading(false);
         }
     }
-
     async function loadRecentlyViewed() {
         const uid = userId();
         if (!uid) {
@@ -162,7 +156,6 @@ export default function Cart() {
             setIsRecentlyViewedLoading(false);
         }
     }
-
     // ---------- Calculations ----------
     const subtotal = round2(cartItems.reduce((sum, item) => sum + item.mrp * item.quantity, 0));
     const productDiscountTotal = round2(
@@ -176,11 +169,9 @@ export default function Cart() {
     const taxAmount = round2(taxableAmount * TAX_RATE);
     const total = round2(taxableAmount + taxAmount);
     const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-
     function itemTotal(item: CartItem): number {
         return round2(item.price * item.quantity);
     }
-
     // ---------- Cart actions (optimistic UI + rollback) ----------
     async function syncQuantity(itemId: number, newQty: number, previousQty: number) {
         const uid = userId();
@@ -217,7 +208,6 @@ export default function Cart() {
         setCartItems((cur) => cur.map((i) => (i.id === item.id ? { ...i, quantity: clamped } : i)));
         if (clamped !== prev) syncQuantity(item.id, clamped, prev);
     }
-
     // ---------- Size ----------
     async function onSizeChange(item: CartItem, e: React.ChangeEvent<HTMLSelectElement>) {
         const newSize = e.target.value;
@@ -233,7 +223,6 @@ export default function Cart() {
             toast.error("Failed to update size.");
         }
     }
-
     async function removeItem(id: number) {
         const uid = userId();
         if (!uid) return;
@@ -254,7 +243,6 @@ export default function Cart() {
             toast.error("Failed to remove item.");
         }
     }
-
     // ---------- Coupon ----------
     function applyCoupon() {
         const code = couponCode.trim().toUpperCase();
@@ -276,37 +264,34 @@ export default function Cart() {
         setCouponCode("");
         setCouponError("");
     }
-
     function goBack() {
         router.back();
     }
-
     function proceedToCheckout() {
-    if (cartItems.length === 0) return;
-    setOrderSummary({
-        items: cartItems.map((i) => ({
-            name: i.name,
-            qty: i.quantity,
-            price: i.price,
-            mrp: i.mrp,
-            discountType: i.discountType,
-            discountValue: i.discountValue,
-            image: i.image,
-            size: i.size,
-            productId: i.productId,
-            productColorVariantId: i.productColorVariantId,
-            productSizeStockId: i.productSizeStockId,
-        })),
-        subtotal,
-        discountAmount,
-        shippingCharge: 0,
-        taxAmount,
-        total,
-        couponCode: appliedCoupon || undefined,
-    });
-    router.push("/checkout");
-}
-
+        if (cartItems.length === 0) return;
+        setOrderSummary({
+            items: cartItems.map((i) => ({
+                name: i.name,
+                qty: i.quantity,
+                price: i.price,
+                mrp: i.mrp,
+                discountType: i.discountType,
+                discountValue: i.discountValue,
+                image: i.image,
+                size: i.size,
+                productId: i.productId,
+                productColorVariantId: i.productColorVariantId,
+                productSizeStockId: i.productSizeStockId,
+            })),
+            subtotal,
+            discountAmount,
+            shippingCharge: 0,
+            taxAmount,
+            total,
+            couponCode: appliedCoupon || undefined,
+        });
+        router.push("/checkout");
+    }
     if (loading) {
         return (
             <div className="text-center py-5">
@@ -315,7 +300,6 @@ export default function Cart() {
             </div>
         );
     }
-
     // Reusable size select block
     const renderSizeSelect = (item: CartItem) =>
         item.size ? (
@@ -332,7 +316,6 @@ export default function Cart() {
                 ))}
             </select>
         );
-
     const orderSummaryBlock = (
         <div className="cart-right">
             <div className="body-head mb-3">
@@ -373,7 +356,6 @@ export default function Cart() {
             </div>
         </div>
     );
-
     return (
         <div className="cart my-4">
             {/* Breadcrumb */}

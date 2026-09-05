@@ -141,7 +141,7 @@ export interface CollectionItem {
   slug?: string;
   category?: {
     id: number;
-    name: string;k
+    name: string;
   };
 }
 

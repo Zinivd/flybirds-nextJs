@@ -21,27 +21,24 @@ import "./page.css";
 import "./content.css";
 import "./description.css";
 import "./review.css";
-
+// import "./lightbox.css";
 interface SizeStock {
     id: number;
     size: string;
     stock: number;
     price: number;
 }
-
 interface FamilyColor {
     id: number;
     name: string;
     code: string;
 }
-
 interface FamilyColorChild {
     id: number;
     family_color_id: number;
     name: string;
     code: string;
 }
-
 interface ColorVariant {
     id: number;
     product_id: number;
@@ -52,7 +49,6 @@ interface ColorVariant {
     gallery_images: { image_url: string; sort_order: number }[];
     size_stocks: SizeStock[];
 }
-
 interface ProductReview {
     id: number;
     title: string;
@@ -61,13 +57,11 @@ interface ProductReview {
     userName: string;
     createdAt: string;
 }
-
 const highlights = [
     { icon: "bx bx-cart", text: "100% Original Products" },
     { icon: "bx bx-handshake", text: "Easy 7 days returns and exchanges" },
     { icon: "bx bx-currency-note", text: "Cash on Delivery" },
 ];
-
 const fabrics = [
     { text: "Machine Wash", img: "/assets/images/Icons/1.png" },
     { text: "Do Not Tumble Dry", img: "/assets/images/Icons/2.png" },
@@ -77,23 +71,18 @@ const fabrics = [
     { text: "Wash with like colors", img: "/assets/images/Icons/6.png" },
     { text: "Wash Inside Out", img: "/assets/images/Icons/7.png" },
 ];
-
 const SLIDES_PER_PAGE = 3;
-
 function getStars(count: number): number[] {
     return Array(Math.round(count)).fill(0);
 }
-
 function isWhiteCode(code: string) {
     return ["#fff", "#ffffff", "#fffff"].includes((code || "").toLowerCase());
 }
-
 function mapProduct(row: any): ProductItem {
     const firstVariant = row.color_variants?.[0];
     const sortedImages = firstVariant?.gallery_images
         ?.slice()
         .sort((a: any, b: any) => a.sort_order - b.sort_order);
-
     return {
         id: row.id,
         name: row.name,
@@ -130,11 +119,9 @@ function mapProduct(row: any): ProductItem {
         color_variants: row.color_variants || [],
     };
 }
-
 function ProductDetailsInner() {
     const searchParams = useSearchParams();
     const productId = Number(searchParams.get("id"));
-
     const [loading, setLoading] = useState(true);
     const [category, setCategory] = useState("");
     const [productName, setProductName] = useState("");
@@ -149,15 +136,15 @@ function ProductDetailsInner() {
     const [estimatedDelivery, setEstimatedDelivery] = useState("");
     const [productImages, setProductImages] = useState<string[]>([]);
     const [specifications, setSpecifications] = useState<{ label: string; value: any }[]>([]);
-
     // Detail Spotlight image
     const [spotlightImage, setSpotlightImage] = useState("");
-
     // SEO
     const [seoTitle, setSeoTitle] = useState("");
     const [seoDescription, setSeoDescription] = useState("");
     const [seoKeywords, setSeoKeywords] = useState("");
-
+    // Discount info kept from the product response so per-size price can be recalculated
+    const [discountRawValue, setDiscountRawValue] = useState(0);
+    const [discountRawType, setDiscountRawType] = useState<string | null>(null);
     // Color / shade / size
     const [colorVariants, setColorVariants] = useState<ColorVariant[]>([]);
     const [familyColors, setFamilyColors] = useState<FamilyColor[]>([]);
@@ -167,7 +154,6 @@ function ProductDetailsInner() {
     const [availableSizes, setAvailableSizes] = useState<string[]>([]);
     const [selectedSizeStockId, setSelectedSizeStockId] = useState<number | null>(null);
     const [selectedSize, setSelectedSize] = useState("");
-
     // Reviews
     const [reviews, setReviews] = useState<ProductReview[]>([]);
     const [isReviewsLoading, setIsReviewsLoading] = useState(true);
@@ -176,18 +162,18 @@ function ProductDetailsInner() {
     const [submittingReview, setSubmittingReview] = useState(false);
     const [reviewForm, setReviewForm] = useState({ title: "", description: "", rating: 0 });
     const [hoverStar, setHoverStar] = useState(0);
-
     // Similar products
     const [products, setProducts] = useState<ProductItem[]>([]);
     const [isSimilarLoading, setIsSimilarLoading] = useState(true);
     const [isWishlisted, setIsWishlisted] = useState(false);
     const [wishlistBusy, setWishlistBusy] = useState(false);
     const [addingToCart, setAddingToCart] = useState(false);
-
+    // Image lightbox / preview
+    const [lightboxOpen, setLightboxOpen] = useState(false);
+    const [lightboxIndex, setLightboxIndex] = useState(0);
     function userId() {
         return typeof window !== "undefined" ? localStorage.getItem("userId") : null;
     }
-
     useEffect(() => {
         if (productId) {
             getProduct();
@@ -195,7 +181,6 @@ function ProductDetailsInner() {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [productId]);
-
     // ---------- SEO meta tags (client-rendered, since data loads after mount) ----------
     useEffect(() => {
         if (loading) return;
@@ -204,7 +189,6 @@ function ProductDetailsInner() {
         setMetaTag("keywords", seoKeywords);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loading, seoTitle, seoDescription, seoKeywords, productName, productDescription]);
-
     function setMetaTag(name: string, content: string) {
         if (!content) return;
         let tag = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement | null;
@@ -215,37 +199,34 @@ function ProductDetailsInner() {
         }
         tag.setAttribute("content", content);
     }
-
     async function getProduct() {
         setLoading(true);
         try {
             const res = await getProductById<any>(productId);
             const product = res.data;
-
             setCategory(product.category?.name || "");
             setProductName(product.name);
             setProductDescription(htmlToPlainText(product.description || ""));
             setSubtitle(product.brand);
             setSpotlightImage(product.spotlight_image || "");
-
             // SEO
             setSeoTitle(product.seo_title || product.name || "");
             setSeoDescription(product.seo_description || "");
             setSeoKeywords(
                 Array.isArray(product.seo_keywords) ? product.seo_keywords.join(", ") : product.seo_keywords || ""
             );
-
             const p = round2(Number(product.effective_price));
             const op = round2(Number(product.unit_price));
             setPrice(p);
             setOriginalPrice(op);
             setDiscountPercent(Number(product.discount) || 0);
             setSavedAmount(round2(op - p));
+            // Remember raw discount so per-size prices can be recalculated the same way
+            setDiscountRawValue(Number(product.discount) || 0);
+            setDiscountRawType(product.discount_type || null);
             setEstimatedDelivery(product.estimate_shipping_days + " Days");
-
             const variants: ColorVariant[] = product.color_variants || [];
             setColorVariants(variants);
-
             // Build unique family colors (dedupe by family_color.id, preserve order)
             const familyMap = new Map<number, FamilyColor>();
             variants.forEach((v) => {
@@ -255,14 +236,12 @@ function ProductDetailsInner() {
             });
             const familyList = Array.from(familyMap.values());
             setFamilyColors(familyList);
-
             if (variants.length) {
                 const firstVariant = variants[0];
                 applyFamilyColor(firstVariant.family_color_id, variants, firstVariant.id);
             } else {
                 setProductImages(["/assets/images/no-image.png"]);
             }
-
             setSpecifications([
                 { label: "Brand", value: product.brand },
                 { label: "Category", value: product.category?.name },
@@ -273,7 +252,6 @@ function ProductDetailsInner() {
                 { label: "Tags", value: product.tags },
                 { label: "Shipping Days", value: product.estimate_shipping_days + " Days" },
             ]);
-
             setIsWishlisted(!!product.is_wishlisted);
             setLoading(false);
             trackRecentlyViewed();
@@ -282,7 +260,6 @@ function ProductDetailsInner() {
             setLoading(false);
         }
     }
-
     async function loadSimilarProducts() {
         setIsSimilarLoading(true);
         try {
@@ -295,7 +272,6 @@ function ProductDetailsInner() {
             setIsSimilarLoading(false);
         }
     }
-
     // ---------- Reviews ----------
     async function loadReviews() {
         setIsReviewsLoading(true);
@@ -322,7 +298,6 @@ function ProductDetailsInner() {
             setIsReviewsLoading(false);
         }
     }
-
     function openReviewModal() {
         if (!userId()) {
             toast.info("Please log in to write a review.");
@@ -371,7 +346,6 @@ function ProductDetailsInner() {
             setSubmittingReview(false);
         }
     }
-
     const visibleReviews = reviews.slice(currentSlide, currentSlide + SLIDES_PER_PAGE);
     function prevSlide() {
         if (currentSlide > 0) setCurrentSlide((s) => s - 1);
@@ -379,9 +353,7 @@ function ProductDetailsInner() {
     function nextSlide() {
         if (currentSlide + SLIDES_PER_PAGE < reviews.length) setCurrentSlide((s) => s + 1);
     }
-
     // ---------- Family Color / Shade / Size ----------
-
     function applyFamilyColor(familyColorId: number, variants: ColorVariant[], preferredVariantId?: number) {
         setSelectedFamilyColorId(familyColorId);
         const familyVariants = variants.filter((v) => v.family_color_id === familyColorId);
@@ -392,22 +364,18 @@ function ProductDetailsInner() {
             code: v.family_color_child.code,
         }));
         setShades(shadeList);
-
         const variantToSelect =
             familyVariants.find((v) => v.id === preferredVariantId) || familyVariants[0];
         if (variantToSelect) applyVariant(variantToSelect);
     }
-
     function selectFamilyColor(familyColorId: number) {
         if (familyColorId === selectedFamilyColorId) return;
         applyFamilyColor(familyColorId, colorVariants);
     }
-
     function selectShade(variantId: number) {
         const variant = colorVariants.find((v) => v.id === variantId);
         if (variant) applyVariant(variant);
     }
-
     function applyVariant(variant: ColorVariant) {
         setSelectedVariantId(variant.id);
         const images = (variant.gallery_images || [])
@@ -419,14 +387,39 @@ function ProductDetailsInner() {
         setSelectedSize("");
         setSelectedSizeStockId(null);
     }
-
+    // Recompute the effective price / original price / discount % / saved amount
+    // for a given base price, using the same discount rule as the product.
+    function computePricingForBase(basePrice: number) {
+        const base = round2(Number(basePrice));
+        let effective = base;
+        let percent = 0;
+        if (discountRawType === "percent" && discountRawValue > 0) {
+            percent = discountRawValue;
+            effective = round2(base - (base * discountRawValue) / 100);
+        } else if (discountRawType === "flat" && discountRawValue > 0) {
+            effective = round2(base - discountRawValue);
+            percent = base > 0 ? round2((discountRawValue / base) * 100) : 0;
+        }
+        return {
+            effective,
+            original: base,
+            percent,
+            saved: round2(base - effective),
+        };
+    }
     function selectSize(size: string) {
         setSelectedSize(size);
         const variant = colorVariants.find((v) => v.id === selectedVariantId);
         const stock = variant?.size_stocks.find((s) => s.size === size);
         setSelectedSizeStockId(stock ? stock.id : null);
+        if (stock) {
+            const { effective, original, percent, saved } = computePricingForBase(Number(stock.price));
+            setPrice(effective);
+            setOriginalPrice(original);
+            setDiscountPercent(percent);
+            setSavedAmount(saved);
+        }
     }
-
     // ---------- Wishlist / cart ----------
     async function toggleWishlist() {
         const uid = userId();
@@ -452,51 +445,46 @@ function ProductDetailsInner() {
             setWishlistBusy(false);
         }
     }
-
     async function addToBag() {
-    const uid = userId();
-    if (!uid) {
-        toast.info("Please log in to add items to your bag.");
-        return;
+        const uid = userId();
+        if (!uid) {
+            toast.info("Please log in to add items to your bag.");
+            return;
+        }
+        if (!selectedVariantId) {
+            toast.info("Please select a color.");
+            return;
+        }
+        if (!selectedSizeStockId) {
+            toast.info("Please select a size.");
+            return;
+        }
+        if (addingToCart) return;
+        const variant = colorVariants.find((v) => v.id === selectedVariantId);
+        if (!variant) {
+            toast.error("Selected color variant not found.");
+            return;
+        }
+        setAddingToCart(true);
+        try {
+            await addToCart(uid, {
+                product_id: productId,
+                product_color_variant_id: selectedVariantId,
+                family_color_id: variant.family_color_id,
+                family_color_child_id: variant.family_color_child_id ?? null,
+                product_size_stock_id: selectedSizeStockId,
+                quantity: 1,
+            });
+            toast.success("Added to bag!");
+        } catch {
+            toast.error("Failed to add to bag.");
+        } finally {
+            setAddingToCart(false);
+        }
     }
-    if (!selectedVariantId) {
-        toast.info("Please select a color.");
-        return;
-    }
-    if (!selectedSizeStockId) {
-        toast.info("Please select a size.");
-        return;
-    }
-    if (addingToCart) return;
-
-    const variant = colorVariants.find((v) => v.id === selectedVariantId);
-    if (!variant) {
-        toast.error("Selected color variant not found.");
-        return;
-    }
-
-    setAddingToCart(true);
-    try {
-        await addToCart(uid, {
-            product_id: productId,
-            product_color_variant_id: selectedVariantId,
-            family_color_id: variant.family_color_id,
-            family_color_child_id: variant.family_color_child_id ?? null,
-            product_size_stock_id: selectedSizeStockId,
-            quantity: 1,
-        });
-        toast.success("Added to bag!");
-    } catch {
-        toast.error("Failed to add to bag.");
-    } finally {
-        setAddingToCart(false);
-    }
-}
-
     function buyNow() {
         addToBag();
     }
-
     async function trackRecentlyViewed() {
         const uid = userId();
         if (!uid) return;
@@ -506,7 +494,35 @@ function ProductDetailsInner() {
             console.error("Failed to record recently viewed:", err?.response?.data || err);
         }
     }
-
+    // ---------- Image Lightbox ----------
+    function openLightbox(index: number) {
+        setLightboxIndex(index);
+        setLightboxOpen(true);
+    }
+    function closeLightbox() {
+        setLightboxOpen(false);
+    }
+    function prevLightboxImage() {
+        setLightboxIndex((i) => (i - 1 + productImages.length) % productImages.length);
+    }
+    function nextLightboxImage() {
+        setLightboxIndex((i) => (i + 1) % productImages.length);
+    }
+    useEffect(() => {
+        if (!lightboxOpen) return;
+        function handleKeyDown(e: KeyboardEvent) {
+            if (e.key === "Escape") closeLightbox();
+            if (e.key === "ArrowLeft") prevLightboxImage();
+            if (e.key === "ArrowRight") nextLightboxImage();
+        }
+        document.addEventListener("keydown", handleKeyDown);
+        document.body.style.overflow = "hidden";
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown);
+            document.body.style.overflow = "";
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [lightboxOpen, productImages.length]);
     if (loading) {
         return (
             <div className="text-center py-5">
@@ -515,7 +531,6 @@ function ProductDetailsInner() {
             </div>
         );
     }
-
     return (
         <div className="product-details my-4">
             {/* Breadcrumb */}
@@ -527,13 +542,18 @@ function ProductDetailsInner() {
                     <a className="active">{category}</a>
                 </h6>
             </div>
-
             {/* Product Content */}
             <div className="product-details-main">
                 <div className="product-content">
                     <div className="product-content-left">
                         {productImages.map((img, i) => (
-                            <div className="product-content-img" key={i}>
+                            <div
+                                className="product-content-img"
+                                key={i}
+                                onClick={() => openLightbox(i)}
+                                role="button"
+                                tabIndex={0}
+                            >
                                 <img src={img} alt="" />
                             </div>
                         ))}
@@ -573,7 +593,6 @@ function ProductDetailsInner() {
                         </div>
                         <h6 className="mb-2">(Inclusive of all taxes)</h6>
                         <hr />
-
                         {/* Select Family Color */}
                         <div className="d-flex justify-content-between align-items-center flex-wrap">
                             <h5 className="mb-3">Select Family Color</h5>
@@ -596,7 +615,6 @@ function ProductDetailsInner() {
                                 </div>
                             ))}
                         </div>
-
                         {/* Select Shade */}
                         {shades.length > 0 && (
                             <>
@@ -624,7 +642,6 @@ function ProductDetailsInner() {
                             </>
                         )}
                         <hr />
-
                         {/* Sizes */}
                         <div className="d-flex justify-content-between align-items-center flex-wrap">
                             <h5 className="mb-2">Select Size</h5>
@@ -641,10 +658,9 @@ function ProductDetailsInner() {
                             ))}
                         </div>
                         <hr />
-
                         {/* Buttons */}
                         <div className="d-flex align-items-center column-gap-1">
-                            <button className="cart-btn w-100" onClick={buyNow}>
+                            <button className="cart-btn1 w-100" onClick={buyNow}>
                                 Buy Now
                             </button>
                             <button className="cart-btn w-100 active" onClick={addToBag} disabled={addingToCart}>
@@ -652,7 +668,6 @@ function ProductDetailsInner() {
                             </button>
                         </div>
                         <hr />
-
                         {/* Highlights */}
                         {highlights.map((item, i) => (
                             <div className="d-flex align-items-center column-gap-3 mb-3" key={i}>
@@ -669,9 +684,7 @@ function ProductDetailsInner() {
                     </div>
                 </div>
             </div>
-
             <hr />
-
             {/* PRODUCT DESCRIPTION */}
             <div className="product-description-main">
                 <div className="product-description-left">
@@ -712,7 +725,6 @@ function ProductDetailsInner() {
                     </div>
                 </div>
             </div>
-
             {/* REVIEWS */}
             <div className="product-review-main">
                 <div className="product-review-div">
@@ -781,7 +793,6 @@ function ProductDetailsInner() {
                     </div>
                 </div>
             </div>
-
             {/* Write a Review Modal */}
             {showReviewModal && (
                 <div className="custom-modal-overlay" onClick={closeReviewModal}>
@@ -845,7 +856,6 @@ function ProductDetailsInner() {
                     </div>
                 </div>
             )}
-
             {/* SIMILAR PRODUCTS */}
             <div className="product-main mt-4">
                 {isSimilarLoading && (
@@ -867,10 +877,67 @@ function ProductDetailsInner() {
                     </div>
                 )}
             </div>
+            {/* IMAGE LIGHTBOX / PREVIEW */}
+            {lightboxOpen && productImages.length > 0 && (
+                <div className="lightbox-overlay" onClick={closeLightbox}>
+                    <div className="lightbox-header" onClick={(e) => e.stopPropagation()}>
+                        <div className="lightbox-header-info">
+                            <span className="lightbox-title">{productName}</span>
+                        </div>
+                        <div className="lightbox-header-actions">
+                            <span className="lightbox-counter">
+                                {lightboxIndex + 1} of {productImages.length}
+                            </span>
+                            <button className="lightbox-close-btn" onClick={closeLightbox} aria-label="Close preview">
+                                <i className="fas fa-xmark"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div className="lightbox-body" onClick={(e) => e.stopPropagation()}>
+                        {productImages.length > 1 && (
+                            <button
+                                className="lightbox-arrow lightbox-arrow-left"
+                                onClick={prevLightboxImage}
+                                aria-label="Previous image"
+                            >
+                                <i className="fas fa-chevron-left"></i>
+                            </button>
+                        )}
+                        <div className="lightbox-image-wrapper">
+                            <img
+                                src={productImages[lightboxIndex]}
+                                alt={`${productName} ${lightboxIndex + 1}`}
+                                className="lightbox-image"
+                            />
+                        </div>
+                        {productImages.length > 1 && (
+                            <button
+                                className="lightbox-arrow lightbox-arrow-right"
+                                onClick={nextLightboxImage}
+                                aria-label="Next image"
+                            >
+                                <i className="fas fa-chevron-right"></i>
+                            </button>
+                        )}
+                    </div>
+                    {productImages.length > 1 && (
+                        <div className="lightbox-thumbnails" onClick={(e) => e.stopPropagation()}>
+                            {productImages.map((img, i) => (
+                                <div
+                                    key={i}
+                                    className={`lightbox-thumb ${i === lightboxIndex ? "active" : ""}`}
+                                    onClick={() => setLightboxIndex(i)}
+                                >
+                                    <img src={img} alt="" />
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }
-
 export default function ProductDetails() {
     return (
         <Suspense

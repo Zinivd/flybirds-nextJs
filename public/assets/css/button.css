@@ -114,6 +114,19 @@
     justify-content: center;
     gap: 10px;
 }
+.cart-btn1 {
+    background: var(--secondary);
+    color: var(--main);
+    border: 2px solid var(--main);
+    padding: 7px 20px;
+    border-radius: 5px;
+    font-weight: var(--fw-md);
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
 
 .form-btn {
     background: var(--main);
@@ -229,6 +242,11 @@
 .cart-btn:hover {
     background: var(--secondary);
     color: var(--text-primary);
+}
+
+.cart-btn1:hover {
+    background: var(--main);
+    color: var(--secondary);
 }
 
 .reset-btn:hover {
