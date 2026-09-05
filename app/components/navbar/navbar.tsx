@@ -6,12 +6,10 @@ import { getCartWishlistSummary, getCategoryList, getProducts } from "@/app/lib/
 import { CategoryItem } from "@/app/types/shop.models";
 import "./navbar.css";
 
-// Static promo images shown in the mega menu — no category lookup,
-// no click-through, just the picture with its name above it.
 const MEGA_MENU_PROMOS: { image: string; name: string }[] = [
-    { image: "/assets/images/Explore/Ankle.png", name: "Ankle Leggings" },
+    { image: "/assets/images/Explore/Ankle.png", name: "Ankle Length Leggings" },
     { image: "/assets/images/Explore/Saree.png", name: "Saree Shaper" },
-    { image: "/assets/images/Explore/Shimmer.png", name: "Shimmer Leggings" },
+    { image: "/assets/images/Explore/Shimmer.png", name: "Shimmer" },
 ];
 
 interface SearchProduct {
@@ -221,6 +219,11 @@ export default function Navbar() {
     const getCategoryHrefById = (category: CategoryItem) =>
         `/all-products?categoryName=${encodeURIComponent(category.name)}&categoryId=${category.id}`;
 
+    const normalizeName = (s: string) => s.replace(/\u00a0/g, " ").trim().toLowerCase();
+
+    const findCategoryByName = (name: string) =>
+        categories.find((cat) => normalizeName(cat.name) === normalizeName(name));
+
     // ---------- Mega menu panel ----------
     const renderMegaMenu = () => {
         if (!megaMenuOpen) return null;
@@ -229,24 +232,10 @@ export default function Navbar() {
             <div
                 onMouseEnter={openMegaMenu}
                 onMouseLeave={scheduleCloseMegaMenu}
-                style={{
-                    position: "absolute",
-                    top: "100%",
-                    left: 0,
-                    width: "750px",
-                    maxWidth: "95vw",
-                    background: "#fff",
-                    border: "1px solid var(--border, #e5e5e5)",
-                    borderRadius: "10px",
-                    boxShadow: "0 12px 32px rgba(0,0,0,0.15)",
-                    padding: "20px 25px",
-                    zIndex: 100,
-                    display: "flex",
-                    gap: "32px",
-                }}
+                className="nav-drop"
             >
                 {/* Left: all categories from the API, in a scannable multi-column list */}
-                <div style={{ flex: "1 1 45%" }}>
+                <div className="nav-drop-left">
                     <h6 style={{ marginBottom: 16, fontWeight: 700 }}>Shop by Category</h6>
                     {categories.length === 0 ? (
                         <p style={{ fontSize: 14, color: "#888" }}>Loading categories…</p>
@@ -257,20 +246,14 @@ export default function Navbar() {
                                 margin: 0,
                                 padding: 0,
                                 columnCount: 2,
-                                columnGap: "20px",
+                                columnGap: "10px",
                             }}
                         >
                             {categories.map((cat) => (
-                                <li key={cat.id} style={{ breakInside: "avoid", marginBottom: 12 }}>
+                                <li key={cat.id} style={{ breakInside: "avoid", marginBottom: 10 }}>
                                     <Link
                                         href={getCategoryHrefById(cat)}
                                         onClick={() => setMegaMenuOpen(false)}
-                                        style={{
-                                            display: "block",
-                                            fontSize: 14,
-                                            color: "#333",
-                                            textDecoration: "none",
-                                        }}
                                     >
                                         {cat.name}
                                     </Link>
@@ -281,29 +264,31 @@ export default function Navbar() {
                 </div>
 
                 {/* Right: the 3 promo cards, image sourced from the category's cover_url */}
-                <div style={{ flex: "1 1 55%" }}>
-                    <img src="/assets/images/Logo-Dark.png" height={35} alt="Logo"className="d-flex mx-auto mb-2" />
-                    <h6 style={{ marginBottom: 16, fontWeight: 700, textAlign: "center" }}>
+                <div className="nav-drop-right">
+                    <img src="/assets/images/Logo-Dark.png" height={35} alt="Logo" className="d-flex mx-auto mb-2" />
+                    <h6>
                         Our Special Offers
                     </h6>
-                    <div style={{ display: "flex", gap: "10px" }}>
-                        {MEGA_MENU_PROMOS.map((promo) => (
-                            <div
-                                key={promo.name}
-                                style={{
-                                    flex: 1,
-                                    position: "relative",
-                                    display: "block",
-                                    borderRadius: "8px",
-                                    overflow: "hidden",
-                                    aspectRatio: "1 / 2",
-                                    backgroundImage: `url(${promo.image})`,
-                                    backgroundSize: "cover",
-                                    backgroundPosition: "top",
-                                    backgroundRepeat: "no-repeat",
-                                }}
-                            ></div>
-                        ))}
+                    <div className="d-flex gap-2 cat-img">
+                        {MEGA_MENU_PROMOS.map((promo) => {
+                            const category = findCategoryByName(promo.name);
+                            const style = { backgroundImage: `url(${promo.image})` };
+
+                            if (!category) {
+                                return <div key={promo.name} style={style}></div>;
+                            }
+
+                            return (
+                                <Link
+                                    key={promo.name}
+                                    href={getCategoryHrefById(category)}
+                                    onClick={() => setMegaMenuOpen(false)}
+                                    style={style}
+                                    className="cat-img-item"
+                                >
+                                </Link>
+                            );
+                        })}
                     </div>
                 </div>
             </div>

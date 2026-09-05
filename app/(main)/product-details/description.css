@@ -5,30 +5,28 @@
     margin: 24px 0px;
 }
 
-/* Detail Spotlight — shows product.spotlight_image; falls back to a
-   neutral bordered placeholder heading when no image is set. */
 .product-description-left {
-    width: 564px;
-    height: 710px;
     background: #FAF1E6;
     border: 2px solid var(--border);
-    border-radius: 10px;
+    border-radius: 20px;
     overflow: hidden;
     display: flex;
     align-items: stretch;
     justify-content: center;
 }
+
 .product-description-left .spotlight-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
 }
-/* Placeholder (no image) needs its own padding + heading style */
+
 .product-description-left .body-head {
     padding: 20px;
     width: 100%;
 }
+
 .product-description-left .body-head h4 {
     color: var(--text-primary);
     font-weight: var(--fw-lg);
@@ -40,8 +38,7 @@
     border-radius: 10px;
     height: 100%;
 }
-/* Plain-text product description: preserves paragraph breaks that
-   htmlToPlainText() converts from the API's HTML, with no raw tags. */
+
 .product-description-right .description-text {
     white-space: pre-line;
     line-height: 1.6;
@@ -54,6 +51,7 @@
     align-items: start;
     justify-content: space-between;
 }
+
 .fabric-div {
     display: flex;
     align-items: center;
@@ -61,6 +59,7 @@
     flex-direction: column;
     gap: 8px;
 }
+
 .fabric-img {
     border: 2px solid var(--border);
     overflow: hidden;
@@ -69,12 +68,14 @@
     align-items: center;
     justify-content: center;
 }
+
 .fabric-img img {
     width: 50%;
     height: 50%;
     object-fit: contain;
     margin: auto;
 }
+
 .fabric-div h6 {
     color: var(--text-primary);
     font-weight: var(--fw-sm);
@@ -82,19 +83,22 @@
 
 @media screen and (min-width: 1098px) {
     .product-description-main {
-        grid-template-columns: 564px 1fr;
-        column-gap: 20px;
+        grid-template-columns: 48% 51%;
     }
+
     .product-description-right {
         padding: 20px;
     }
+
     .fabric-grid {
         grid-template-columns: repeat(7, 1fr);
     }
+
     .fabric-img {
         width: 70px;
         height: 70px;
     }
+
     .fabric-div h6 {
         font-size: 12px;
     }
@@ -102,23 +106,27 @@
 
 @media screen and (min-width: 767px) and (max-width: 1098px) {
     .product-description-main {
-        grid-template-columns: 40% 58%;
-        column-gap: 20px;
+        grid-template-columns: 47% 52%;
     }
+
     .product-description-left {
         width: 100%;
         height: 500px;
     }
+
     .product-description-right {
         padding: 15px;
     }
+
     .fabric-grid {
         grid-template-columns: repeat(4, 1fr);
     }
+
     .fabric-img {
         width: 40px;
         height: 40px;
     }
+
     .fabric-div h6 {
         font-size: 10px;
     }
@@ -129,20 +137,25 @@
         grid-template-columns: repeat(1, 1fr);
         row-gap: 16px;
     }
+
     .product-description-left {
         width: 100%;
-        height: 360px;
+        height: 500px;
     }
+
     .product-description-right {
         padding: 12px;
     }
+
     .fabric-grid {
         grid-template-columns: repeat(3, 1fr);
     }
+
     .fabric-img {
         width: 40px;
         height: 40px;
     }
+
     .fabric-div h6 {
         font-size: 10px;
     }
